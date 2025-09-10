@@ -77,17 +77,17 @@
         <!-- نشانگر الگو با تنظیمات پایداری -->
         <a-marker type='pattern' url='./marker/pattern-marker.patt' smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2">
             
-            <!-- این گروه کل عکس‌ها را 30 سانت (15 واحد) بالای مارکر منتقل می‌کند -->
-            <a-entity position="0 15 0">
-                <!-- عکس اصلی (اندازه A4) در مرکز. مقیاس: عرض 10.5 برابر و ارتفاع 15 برابر مارکر 2 سانتی -->
-                <a-plane src="#photo1" scale="10.5 15 10.5" position="0 0 0" rotation="-90 0 0"></a-plane>
+            <!-- این گروه کل عکس‌ها را حدود 30 سانت بالای مارکر قرار می‌دهد (position y=0.3) -->
+            <a-entity position="0 0.3 0">
+                
+                <!-- عکس اصلی (تقریباً اندازه A4) در مرکز. مقیاس: عرض 21 سانت و ارتفاع 30 سانت -->
+                <a-plane src="#photo1" scale="0.21 0.3 1" position="0 0 0" rotation="-90 0 0"></a-plane>
 
-                <!-- عکس‌های دیگر با مقیاس و موقعیت جدید در اطراف عکس اصلی -->
-                <a-plane src="#photo2" scale="5 7 5" position="-8 2 0" rotation="-90 0 0"></a-plane>
-                <a-plane src="#photo3" scale="6 8 6" position="9 -1 0" rotation="-90 0 0"></a-plane>
-
-                <a-plane src="#photo4" scale="4 5 4" position="-5 -8 0" rotation="-90 0 10"></a-plane>
-                <a-plane src="#photo5" scale="3 4 3" position="6 7 0" rotation="-90 0 -5"></a-plane>
+                <!-- عکس‌های دیگر با مقیاس و موقعیت‌های جدید و واقعی -->
+                <a-plane src="#photo2" scale="0.15 0.15 1" position="-0.2 0.05 0" rotation="-90 0 0"></a-plane>
+                <a-plane src="#photo3" scale="0.18 0.12 1" position="0.25 -0.05 0" rotation="-90 0 0"></a-plane>
+                <a-plane src="#photo4" scale="0.1 0.1 1" position="-0.1 0.2 0" rotation="-90 0 10"></a-plane>
+                <a-plane src="#photo5" scale="0.12 0.12 1" position="0.15 -0.2 0" rotation="-90 0 -5"></a-plane>
             </a-entity>
 
         </a-marker>
