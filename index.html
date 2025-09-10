@@ -77,17 +77,19 @@
         <!-- نشانگر الگو با تنظیمات پایداری -->
         <a-marker type='pattern' url='./marker/pattern-marker.patt' smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2">
             
-            <!-- چیدمان جدید و مدرن عکس‌ها -->
-            <!-- عکس اصلی و بزرگ در مرکز و بالا -->
-            <a-plane src="#photo1" scale="1.2 1.2 1.2" position="0 1.8 0" rotation="-90 0 0"></a-plane>
+            <!-- این گروه کل عکس‌ها را به بالای قاب منتقل می‌کند -->
+            <a-entity position="0 2.5 0">
+                <!-- عکس اصلی و بزرگ در مرکز -->
+                <a-plane src="#photo1" scale="1.4 1.4 1.4" position="0 0 0" rotation="-90 0 0"></a-plane>
 
-            <!-- دو عکس متوسط در طرفین -->
-            <a-plane src="#photo2" scale="0.8 0.8 0.8" position="-1.1 1 0" rotation="-90 0 0"></a-plane>
-            <a-plane src="#photo3" scale="0.9 0.9 0.9" position="1.2 1.2 0" rotation="-90 0 0"></a-plane>
-            
-            <!-- دو عکس کوچک‌تر برای ایجاد عمق -->
-            <a-plane src="#photo4" scale="0.7 0.7 0.7" position="-1.9 1.9 0" rotation="-90 0 10"></a-plane>
-            <a-plane src="#photo5" scale="0.6 0.6 0.6" position="1.9 0.5 0" rotation="-90 0 -5"></a-plane>
+                <!-- دو عکس متوسط در طرفین، کمی پایین‌تر -->
+                <a-plane src="#photo2" scale="0.9 0.9 0.9" position="-1.3 -0.2 0" rotation="-90 0 0"></a-plane>
+                <a-plane src="#photo3" scale="1.0 1.0 1.0" position="1.4 0.1 0" rotation="-90 0 0"></a-plane>
+
+                <!-- دو عکس کوچک‌تر برای ایجاد عمق و تنوع -->
+                <a-plane src="#photo4" scale="0.7 0.7 0.7" position="-0.7 0.9 0" rotation="-90 0 10"></a-plane>
+                <a-plane src="#photo5" scale="0.6 0.6 0.6" position="0.8 -0.8 0" rotation="-90 0 -5"></a-plane>
+            </a-entity>
 
         </a-marker>
 
