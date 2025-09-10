@@ -71,20 +71,23 @@
           <img id="photo2" src="https://placehold.co/800x800/0a192f/64ffda?text=Photo+2" crossorigin="anonymous">
           <img id="photo3" src="https://placehold.co/800x800/0a192f/64ffda?text=Photo+3" crossorigin="anonymous">
           <img id="photo4" src="https://placehold.co/800x800/0a192f/64ffda?text=Photo+4" crossorigin="anonymous">
+          <img id="photo5" src="https://placehold.co/800x800/0a192f/64ffda?text=Photo+5" crossorigin="anonymous">
         </a-assets>
 
-        <!-- نشانگر الگو (Pattern Marker) -->
-        <!-- این نشانگر را خودتان در مرحله بعد می‌سازید -->
-        <a-marker type='pattern' url='./marker/pattern-marker.patt'>
+        <!-- نشانگر الگو با تنظیمات پایداری -->
+        <a-marker type='pattern' url='./marker/pattern-marker.patt' smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2">
             
-            <!-- عکس‌های مجازی در اینجا ظاهر می‌شوند -->
-            <!-- توجه: اعداد position و scale تغییر کرده‌اند -->
-            <a-entity position="0 0.2 0" scale="1.5 1.5 1.5">
-                <a-plane src="#photo1" position="-1 0 0" rotation="-90 0 0"></a-plane>
-                <a-plane src="#photo2" position="1 0 0" rotation="-90 0 0"></a-plane>
-                <a-plane src="#photo3" position="0 0 -1" rotation="-90 0 0"></a-plane>
-                <a-plane src="#photo4" position="0 0 1" rotation="-90 0 0"></a-plane>
-            </a-entity>
+            <!-- چیدمان جدید و مدرن عکس‌ها -->
+            <!-- عکس اصلی و بزرگ در مرکز و بالا -->
+            <a-plane src="#photo1" scale="1.2 1.2 1.2" position="0 1.8 0" rotation="-90 0 0"></a-plane>
+
+            <!-- دو عکس متوسط در طرفین -->
+            <a-plane src="#photo2" scale="0.8 0.8 0.8" position="-1.1 1 0" rotation="-90 0 0"></a-plane>
+            <a-plane src="#photo3" scale="0.9 0.9 0.9" position="1.2 1.2 0" rotation="-90 0 0"></a-plane>
+            
+            <!-- دو عکس کوچک‌تر برای ایجاد عمق -->
+            <a-plane src="#photo4" scale="0.7 0.7 0.7" position="-1.9 1.9 0" rotation="-90 0 10"></a-plane>
+            <a-plane src="#photo5" scale="0.6 0.6 0.6" position="1.9 0.5 0" rotation="-90 0 -5"></a-plane>
 
         </a-marker>
 
@@ -92,7 +95,6 @@
     </a-scene>
 
     <script>
-      // این بخش جاوااسکریپت برای رفع خطا تغییر کرده است
       document.addEventListener('DOMContentLoaded', () => {
         const startArButton = document.getElementById('start-ar-button');
         const watchVideoButton = document.getElementById('watch-video-button');
@@ -100,12 +102,8 @@
         const videoOverlay = document.getElementById('video-overlay');
         const videoPlayer = document.getElementById('anniversary-video');
         const closeVideoButton = document.getElementById('close-video');
-
-        // صحنه AR دیگر به صورت دستی مخفی نمی‌شود تا از خطاهای WebGL جلوگیری شود.
-        // صفحه شروع به صورت یک لایه روی آن قرار می‌گیرد.
         
         startArButton.addEventListener('click', () => {
-          // فقط صفحه شروع را مخفی می‌کنیم تا صحنه AR نمایان شود
           startContainer.style.display = 'none';
         });
 
