@@ -116,26 +116,47 @@
 
         <a-assets timeout="30000">
             <img id="empty-frame" src="https://i.imgur.com/aC3z2G5.png" crossorigin="anonymous">
+
+            <img id="real-photo-1" src="https://raw.githubusercontent.com/amirbemanip/aks/main/2.jpg">
+            <img id="real-photo-2" src="https://raw.githubusercontent.com/amirbemanip/aks/main/2.jpg">
+            <img id="real-photo-3" src="https://raw.githubusercontent.com/amirbemanip/aks/main/2.jpg">
+            <img id="real-photo-4" src="https://raw.githubusercontent.com/amirbemanip/aks/main/2.jpg">
+            <img id="real-photo-5" src="https://raw.githubusercontent.com/amirbemanip/aks/main/2.jpg">
         </a-assets>
 
-        <a-marker id="animated-marker" type="pattern" url="YOUR_PATTERN_MARKER_LINK.patt" smooth="true" smoothCount="5">
+        <a-marker id="animated-marker" type="pattern" url="YOUR_PATTERN_MARKER_LINK.patt">
+            
             <a-entity 
                 id="gallery-container" 
-                position="0 0.1 0" 
+                position="0 0.6 0" 
                 scale="0 0 0" 
-                visible="false" 
-                animation__scale="property: scale; to: 1 1 1; dur: 1500; easing: easeOutElastic; startEvents: markerFound" 
-                animation__rotation="property: rotation; from: -90 0 90; to: -90 0 0; dur: 1000; delay: 500; easing: easeOutCubic; startEvents: markerFound">
+                visible="false"
+                animation="property: scale; to: 1 1 1; dur: 1500; easing: easeOutElastic; startEvents: markerFound">
 
-                <a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="1.0" position="0 0 0"></a-plane>
+                <a-entity position="-1.0 0.6 0" rotation="-90 0 10">
+                    <a-plane class="photo-plane" material="src: #real-photo-1; transparent: true; opacity: 0;" width="0.72" height="0.9" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="1.0"></a-plane>
+                </a-entity>
                 
-                <a-plane material="src: #empty-frame; transparent: true;" width="0.6" height="0.75" position="-0.9 0.5 0" rotation="0 0 -15"></a-plane>
+                <a-entity position="0 0.8 0" rotation="-90 0 0">
+                    <a-plane class="photo-plane" material="src: #real-photo-2; transparent: true; opacity: 0;" width="0.81" height="0.54" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #empty-frame; transparent: true;" width="0.9" height="0.6"></a-plane>
+                </a-entity>
                 
-                <a-plane material="src: #empty-frame; transparent: true;" width="0.7" height="0.875" position="0.9 0.4 0" rotation="0 0 12"></a-plane>
+                <a-entity position="1.0 0.7 0" rotation="-90 0 0">
+                    <a-plane class="photo-plane" material="src: #real-photo-3; transparent: true; opacity: 0;" width="0.72" height="0.48" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="0.53"></a-plane>
+                </a-entity>
                 
-                <a-plane material="src: #empty-frame; transparent: true;" width="0.5" height="0.625" position="-0.7 -0.8 0" rotation="0 0 10"></a-plane>
+                <a-entity position="-1.0 -0.4 0" rotation="-90 0 0">
+                    <a-plane class="photo-plane" material="src: #real-photo-4; transparent: true; opacity: 0;" width="0.81" height="0.54" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #empty-frame; transparent: true;" width="0.9" height="0.6"></a-plane>
+                </a-entity>
                 
-                <a-plane material="src: #empty-frame; transparent: true;" width="0.6" height="0.75" position="0.8 -0.9 0" rotation="0 0 -18"></a-plane>
+                <a-entity position="1.0 -0.2 0" rotation="-90 0 -5">
+                    <a-plane class="photo-plane" material="src: #real-photo-5; transparent: true; opacity: 0;" width="0.72" height="0.9" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="1.0"></a-plane>
+                </a-entity>
 
             </a-entity>
         </a-marker>
@@ -156,7 +177,8 @@
                 closeVideoBtn: document.getElementById('close-video-btn'),
                 arInstructions: document.getElementById('ar-instructions'),
                 marker: document.getElementById('animated-marker'),
-                galleryContainer: document.getElementById('gallery-container')
+                galleryContainer: document.getElementById('gallery-container'),
+                photoPlanes: document.querySelectorAll('.photo-plane')
             };
 
             elements.loader.classList.remove('active');
@@ -184,10 +206,23 @@
 
             elements.marker.addEventListener('markerFound', () => {
                 elements.galleryContainer.setAttribute('visible', 'true');
+                elements.photoPlanes.forEach(plane => {
+                    plane.setAttribute('animation', {
+                        property: 'material.opacity',
+                        to: 1,
+                        dur: 1500,
+                        delay: 700,
+                        easing: 'easeInOutQuad'
+                    });
+                });
             });
 
             elements.marker.addEventListener('markerLost', () => {
                 elements.galleryContainer.setAttribute('visible', 'false');
+                elements.photoPlanes.forEach(plane => {
+                    plane.removeAttribute('animation');
+                    plane.setAttribute('material', 'opacity', 0);
+                });
             });
         });
     </script>
