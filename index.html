@@ -24,7 +24,6 @@
         #anniversary-video { width: 95%; max-width: 900px; border-radius: 12px; }
         .close-btn { position: absolute; top: 20px; right: 25px; font-size: 45px; font-weight: bold; color: white; cursor: pointer; }
         
-        /* ✅ استایل برای متن راهنمای روی صفحه دوربین */
         #debug-text {
             position: fixed;
             bottom: 20px;
@@ -36,7 +35,7 @@
             border-radius: 10px;
             z-index: 100;
             font-size: 16px;
-            display: none; /* در ابتدا مخفی است */
+            display: none;
         }
     </style>
 </head>
@@ -56,11 +55,10 @@
         <video id="anniversary-video" controls><source src="YOUR_VIDEO_LINK.mp4" type="video/mp4"></video>
     </div>
 
-    <!-- ✅ متن راهنما برای عیب‌یابی -->
     <div id="debug-text">Searching for marker...</div>
 
-    <!-- AR Scene (Simplified and Stable) -->
-    <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
+    <!-- AR Scene -->
+    <a-scene id="main-scene" embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
         <a-assets>
             <img id="empty-frame" src="https://i.imgur.com/aC3z2G5.png" crossorigin="anonymous">
             <img id="real-photo-1" src="YOUR_PHOTO_1_LINK.jpg" crossorigin="anonymous">
@@ -70,9 +68,10 @@
             <img id="real-photo-5" src="YOUR_PHOTO_5_LINK.jpg" crossorigin="anonymous">
         </a-assets>
 
-        <!-- The marker directly contains the gallery -->
+        <!-- مارکر در ابتدا گالری را در خود دارد -->
         <a-marker id="main-marker" type='pattern' url='./marker/pattern-marker.patt'>
-            <a-entity id="gallery-container" position="0 0.6 0">
+            <!-- گالری در ابتدا مخفی است -->
+            <a-entity id="gallery-container" position="0 0.6 0" visible="false">
                 <!-- Frame 1 (Top Left) -->
                 <a-entity position="-1.0 0.6 0" rotation="-90 0 10">
                     <a-plane material="src: #real-photo-1;" width="0.72" height="0.9" position="0 0 0.01"></a-plane>
@@ -98,34 +97,45 @@
             const closeVideoBtn = document.getElementById('close-video-btn');
             const debugText = document.getElementById('debug-text');
             const marker = document.getElementById('main-marker');
+            const gallery = document.getElementById('gallery-container');
+            const scene = document.getElementById('main-scene');
+
+            // ✅ فلگ برای اینکه عملیات قفل کردن فقط یک بار انجام شود
+            let isAnchored = false;
 
             startArBtn.addEventListener('click', () => {
                 startContainer.classList.add('hidden');
-                debugText.style.display = 'block'; // Show debug text
+                debugText.style.display = 'block';
             });
+            watchVideoBtn.addEventListener('click', () => { videoOverlay.classList.remove('hidden'); videoPlayer.play(); });
+            closeVideoBtn.addEventListener('click', () => { videoOverlay.classList.add('hidden'); videoPlayer.pause(); });
 
-            watchVideoBtn.addEventListener('click', () => {
-                videoOverlay.classList.remove('hidden');
-                videoPlayer.play();
-            });
-
-            closeVideoBtn.addEventListener('click', () => {
-                videoOverlay.classList.add('hidden');
-                videoPlayer.pause();
-            });
-
-            // ✅ سیستم عیب‌یابی
             marker.addEventListener('markerFound', () => {
-                console.log("Marker Found!");
-                debugText.textContent = "✅ Marker Detected!";
-                debugText.style.backgroundColor = '#2ecc71'; // Green
-            });
+                // این عملیات فقط یک بار اجرا می‌شود
+                if (!isAnchored) {
+                    isAnchored = true;
+                    debugText.textContent = "✅ Gallery Anchored!";
+                    debugText.style.backgroundColor = '#2ecc71';
 
-            marker.addEventListener('markerLost', () => {
-                console.log("Marker Lost!");
-                debugText.textContent = "Searching for marker...";
-                debugText.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'; // Default
+                    // 1. موقعیت و چرخش فعلی گالری را در دنیای واقعی می‌گیریم
+                    const worldPosition = new THREE.Vector3();
+                    const worldQuaternion = new THREE.Quaternion();
+                    gallery.object3D.getWorldPosition(worldPosition);
+                    gallery.object3D.getWorldQuaternion(worldQuaternion);
+
+                    // 2. گالری را از مارکر جدا کرده و به صحنه اصلی اضافه می‌کنیم
+                    scene.appendChild(gallery);
+
+                    // 3. موقعیت و چرخش جهانی آن را به مقادیر قفل شده تنظیم می‌کنیم
+                    gallery.object3D.position.copy(worldPosition);
+                    gallery.object3D.quaternion.copy(worldQuaternion);
+                    
+                    // 4. حالا آن را نمایش می‌دهیم
+                    gallery.setAttribute('visible', 'true');
+                }
             });
+            
+            // دیگر به رویداد markerLost نیازی نداریم چون گالری جدا شده است
         });
     </script>
 </body>
