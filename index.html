@@ -69,9 +69,9 @@
             <img id="real-photo-5" src="YOUR_PHOTO_5_LINK.jpg" crossorigin="anonymous">
         </a-assets>
 
-        <!-- مارکر فقط برای شناسایی اولیه استفاده می‌شود -->
+        <!-- The Marker is only a trigger -->
         <a-marker id="main-marker" type='pattern' url='./marker/pattern-marker.patt'>
-            <!-- ✅ گالری در ابتدا فرزند مارکر است تا موقعیت اولیه آن مشخص شود -->
+            <!-- The gallery is inside the marker initially to get its starting position -->
             <a-entity id="gallery-container" position="0 0.6 0" visible="false">
                 <!-- Frame 1 (Top Left) -->
                 <a-entity position="-1.0 0.6 0" rotation="-90 0 10">
@@ -111,18 +111,32 @@
             closeVideoBtn.addEventListener('click', () => { videoOverlay.classList.add('hidden'); videoPlayer.pause(); });
 
             marker.addEventListener('markerFound', () => {
-                if (isAnchored) return; // این عملیات فقط یک بار اجرا می‌شود
+                if (isAnchored) return; // This runs only once
                 isAnchored = true;
 
-                console.log("Marker Found! Anchoring gallery...");
+                // 1. Create temporary THREE.js objects to store the world transform
+                const worldPosition = new THREE.Vector3();
+                const worldQuaternion = new THREE.Quaternion();
+                const worldScale = new THREE.Vector3();
 
-                // ✅ استفاده از متد پایدار .attach() برای جدا کردن گالری و حفظ موقعیت جهانی آن
-                scene.object3D.attach(gallery.object3D);
+                // 2. Get the gallery's absolute world position, rotation, and scale
+                // while it is still a child of the marker.
+                gallery.object3D.matrixWorld.decompose(worldPosition, worldQuaternion, worldScale);
+
+                // 3. Immediately re-parent the gallery to the main scene.
+                // This "detaches" it from the marker.
+                scene.object3D.add(gallery.object3D);
+
+                // 4. Apply the captured world transforms back to the gallery's local transforms.
+                // This "anchors" it in the exact same spot in the real world.
+                gallery.object3D.position.copy(worldPosition);
+                gallery.object3D.quaternion.copy(worldQuaternion);
+                gallery.object3D.scale.copy(worldScale);
                 
-                // حالا گالری را نمایش می‌دهیم
+                // 5. Finally, make the anchored gallery visible.
                 gallery.setAttribute('visible', 'true');
 
-                // نمایش پیام موفقیت و سپس محو کردن آن
+                // Update debug text
                 debugText.textContent = "✅ Gallery Locked to Wall!";
                 debugText.style.backgroundColor = '#2ecc71';
                 setTimeout(() => { debugText.style.opacity = '0'; }, 2000);
