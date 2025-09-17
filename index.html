@@ -9,54 +9,6 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
-    <!-- ✅ کامپوننت جدید و پایدار برای قفل کردن موقعیت -->
-    <script>
-        AFRAME.registerComponent('anchor-once-visible', {
-            init: function () {
-                this.marker = document.querySelector('#main-marker');
-                this.sceneEl = this.el.sceneEl;
-                this.isAnchored = false;
-                
-                // گالری در ابتدا کاملاً مخفی است
-                this.el.setAttribute('visible', 'false');
-            },
-            // تابع tick در هر فریم اجرا می‌شود
-            tick: function () {
-                // اگر قبلاً قفل شده، دیگر کاری انجام نده
-                if (this.isAnchored) {
-                    this.el.removeComponent(this.name); // کامپوننت را حذف می‌کنیم تا بهینه باشد
-                    return;
-                }
-
-                // چک می‌کنیم آیا مارکر در این فریم دیده می‌شود یا نه
-                if (this.marker.object3D.visible === true) {
-                    console.log("Marker detected, anchoring now.");
-                    this.isAnchored = true;
-
-                    // موقعیت و چرخش مارکر را در دنیای واقعی می‌گیریم
-                    const worldPosition = new THREE.Vector3();
-                    const worldQuaternion = new THREE.Quaternion();
-                    this.marker.object3D.getWorldPosition(worldPosition);
-                    this.marker.object3D.getWorldQuaternion(worldQuaternion);
-
-                    // گالری را به صحنه اصلی منتقل می‌کنیم (از مارکر جدا می‌کنیم)
-                    this.sceneEl.object3D.add(this.el.object3D);
-
-                    // موقعیت و چرخش جهانی آن را تنظیم می‌کنیم
-                    this.el.object3D.position.copy(worldPosition);
-                    this.el.object3D.quaternion.copy(worldQuaternion);
-                    
-                    // حالا آن را نمایش می‌دهیم
-                    this.el.setAttribute('visible', 'true');
-                    
-                    const debugText = document.getElementById('debug-text');
-                    debugText.textContent = "✅ Gallery Anchored & Stable!";
-                    debugText.style.backgroundColor = '#2ecc71';
-                }
-            }
-        });
-    </script>
-
     <style>
         /* Basic Styles */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
@@ -84,6 +36,7 @@
             z-index: 100;
             font-size: 16px;
             display: none;
+            transition: opacity 0.5s;
         }
     </style>
 </head>
@@ -117,22 +70,21 @@
         </a-assets>
 
         <!-- مارکر فقط برای شناسایی اولیه استفاده می‌شود -->
-        <a-marker id="main-marker" type='pattern' url='./marker/pattern-marker.patt'></a-marker>
-
-        <!-- ✅ گالری حالا از کامپوننت جدید ما استفاده می‌کند -->
-        <a-entity id="gallery-container" position="0 0.6 0" anchor-once-visible>
-            <!-- Frame 1 (Top Left) -->
-            <a-entity position="-1.0 0.6 0" rotation="-90 0 10">
-                <a-plane material="src: #real-photo-1;" width="0.72" height="0.9" position="0 0 0.01"></a-plane>
-                <a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="1.0"></a-plane>
+        <a-marker id="main-marker" type='pattern' url='./marker/pattern-marker.patt'>
+            <!-- ✅ گالری در ابتدا فرزند مارکر است تا موقعیت اولیه آن مشخص شود -->
+            <a-entity id="gallery-container" position="0 0.6 0" visible="false">
+                <!-- Frame 1 (Top Left) -->
+                <a-entity position="-1.0 0.6 0" rotation="-90 0 10">
+                    <a-plane material="src: #real-photo-1;" width="0.72" height="0.9" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="1.0"></a-plane>
+                </a-entity>
+                <!-- Other frames... -->
+                <a-entity position="0 0.8 0" rotation="-90 0 0"><a-plane material="src: #real-photo-2;" width="0.81" height="0.54" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.9" height="0.6"></a-plane></a-entity>
+                <a-entity position="1.0 0.7 0" rotation="-90 0 0"><a-plane material="src: #real-photo-3;" width="0.72" height="0.48" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="0.53"></a-plane></a-entity>
+                <a-entity position="-1.0 -0.4 0" rotation="-90 0 0"><a-plane material="src: #real-photo-4;" width="0.81" height="0.54" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.9" height="0.6"></a-plane></a-entity>
+                <a-entity position="1.0 -0.2 0" rotation="-90 0 -5"><a-plane material="src: #real-photo-5;" width="0.72" height="0.9" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="1.0"></a-plane></a-entity>
             </a-entity>
-            <!-- Other frames... -->
-            <a-entity position="0 0.8 0" rotation="-90 0 0"><a-plane material="src: #real-photo-2;" width="0.81" height="0.54" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.9" height="0.6"></a-plane></a-entity>
-            <a-entity position="1.0 0.7 0" rotation="-90 0 0"><a-plane material="src: #real-photo-3;" width="0.72" height="0.48" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="0.53"></a-plane></a-entity>
-            <a-entity position="-1.0 -0.4 0" rotation="-90 0 0"><a-plane material="src: #real-photo-4;" width="0.81" height="0.54" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.9" height="0.6"></a-plane></a-entity>
-            <a-entity position="1.0 -0.2 0" rotation="-90 0 -5"><a-plane material="src: #real-photo-5;" width="0.72" height="0.9" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="1.0"></a-plane></a-entity>
-        </a-entity>
-
+        </a-marker>
         <a-entity camera></a-entity>
     </a-scene>
 
@@ -145,6 +97,11 @@
             const watchVideoBtn = document.getElementById('watch-video-btn');
             const closeVideoBtn = document.getElementById('close-video-btn');
             const debugText = document.getElementById('debug-text');
+            const scene = document.querySelector('a-scene');
+            const marker = document.getElementById('main-marker');
+            const gallery = document.getElementById('gallery-container');
+
+            let isAnchored = false;
 
             startArBtn.addEventListener('click', () => {
                 startContainer.classList.add('hidden');
@@ -152,6 +109,24 @@
             });
             watchVideoBtn.addEventListener('click', () => { videoOverlay.classList.remove('hidden'); videoPlayer.play(); });
             closeVideoBtn.addEventListener('click', () => { videoOverlay.classList.add('hidden'); videoPlayer.pause(); });
+
+            marker.addEventListener('markerFound', () => {
+                if (isAnchored) return; // این عملیات فقط یک بار اجرا می‌شود
+                isAnchored = true;
+
+                console.log("Marker Found! Anchoring gallery...");
+
+                // ✅ استفاده از متد پایدار .attach() برای جدا کردن گالری و حفظ موقعیت جهانی آن
+                scene.object3D.attach(gallery.object3D);
+                
+                // حالا گالری را نمایش می‌دهیم
+                gallery.setAttribute('visible', 'true');
+
+                // نمایش پیام موفقیت و سپس محو کردن آن
+                debugText.textContent = "✅ Gallery Locked to Wall!";
+                debugText.style.backgroundColor = '#2ecc71';
+                setTimeout(() => { debugText.style.opacity = '0'; }, 2000);
+            });
         });
     </script>
 </body>
