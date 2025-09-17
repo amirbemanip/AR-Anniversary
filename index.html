@@ -114,32 +114,33 @@
                 if (isAnchored) return; // This runs only once
                 isAnchored = true;
 
-                // 1. Create temporary THREE.js objects to store the world transform
-                const worldPosition = new THREE.Vector3();
-                const worldQuaternion = new THREE.Quaternion();
-                const worldScale = new THREE.Vector3();
+                // ✅ By waiting for the next browser frame, we ensure all matrix calculations are complete.
+                setTimeout(() => {
+                    // 1. Create temporary THREE.js objects to store the world transform
+                    const worldPosition = new THREE.Vector3();
+                    const worldQuaternion = new THREE.Quaternion();
+                    const worldScale = new THREE.Vector3();
 
-                // 2. Get the gallery's absolute world position, rotation, and scale
-                // while it is still a child of the marker.
-                gallery.object3D.matrixWorld.decompose(worldPosition, worldQuaternion, worldScale);
+                    // 2. Get the gallery's absolute world position, rotation, and scale
+                    gallery.object3D.updateWorldMatrix(true, false);
+                    gallery.object3D.matrixWorld.decompose(worldPosition, worldQuaternion, worldScale);
 
-                // 3. Immediately re-parent the gallery to the main scene.
-                // This "detaches" it from the marker.
-                scene.object3D.add(gallery.object3D);
+                    // 3. Immediately re-parent the gallery to the main scene.
+                    scene.object3D.add(gallery.object3D);
 
-                // 4. Apply the captured world transforms back to the gallery's local transforms.
-                // This "anchors" it in the exact same spot in the real world.
-                gallery.object3D.position.copy(worldPosition);
-                gallery.object3D.quaternion.copy(worldQuaternion);
-                gallery.object3D.scale.copy(worldScale);
-                
-                // 5. Finally, make the anchored gallery visible.
-                gallery.setAttribute('visible', 'true');
+                    // 4. Apply the captured world transforms back to the gallery's local transforms.
+                    gallery.object3D.position.copy(worldPosition);
+                    gallery.object3D.quaternion.copy(worldQuaternion);
+                    gallery.object3D.scale.copy(worldScale);
+                    
+                    // 5. Finally, make the anchored gallery visible.
+                    gallery.setAttribute('visible', 'true');
 
-                // Update debug text
-                debugText.textContent = "✅ Gallery Locked to Wall!";
-                debugText.style.backgroundColor = '#2ecc71';
-                setTimeout(() => { debugText.style.opacity = '0'; }, 2000);
+                    // Update debug text
+                    debugText.textContent = "✅ Gallery Locked to Wall!";
+                    debugText.style.backgroundColor = '#2ecc71';
+                    setTimeout(() => { debugText.style.opacity = '0'; }, 2000);
+                }, 0); // A timeout of 0 waits for the next available frame
             });
         });
     </script>
