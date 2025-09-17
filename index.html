@@ -1,124 +1,204 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Our Anniversary (AR.js Pattern Marker)</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- کتابخانه‌های لازم - توجه: کتابخانه AR.js تغییر کرده است -->
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>خاطرات ما | نسخه AR</title>
+
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
     <style>
-      body {
-        margin: 0;
-        font-family: 'Poppins', sans-serif;
-        background-color: #0a192f; /* پس‌زمینه سرمه‌ای */
-        color: #ccd6f6; /* رنگ متن روشن */
-      }
-      .container {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex;
-        justify-content: center; align-items: center; flex-direction: column;
-        background-color: #0a192f; text-align: center; z-index: 10;
-      }
-      .container h1 { font-size: 2.5em; color: #fff; }
-      .container p { font-size: 1.2em; margin-bottom: 40px; }
-      .button-container { display: flex; gap: 20px; }
-      .action-button {
-        background-color: transparent; color: #64ffda; padding: 15px 32px;
-        text-align: center; text-decoration: none; display: inline-block;
-        font-size: 18px; font-weight: bold; cursor: pointer; border: 2px solid #64ffda;
-        border-radius: 12px; transition: background-color 0.3s, color 0.3s;
-      }
-      .action-button:hover { background-color: rgba(100, 255, 218, 0.1); }
-      .video-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background-color: rgba(0, 0, 0, 0.85); display: none; /* در ابتدا مخفی */
-        justify-content: center; align-items: center; z-index: 1000;
-      }
-      #anniversary-video { width: 90%; max-width: 800px; border-radius: 10px; }
-      .close-video {
-        position: absolute; top: 20px; right: 35px; color: #fff;
-        font-size: 40px; font-weight: bold; cursor: pointer;
-      }
+        /* --- کدهای CSS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
+
+        :root {
+            --primary-bg: #0a192f;
+            --text-light: #ccd6f6;
+            --accent: #64ffda;
+            --accent-dark: rgba(100, 255, 218, 0.1);
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-light);
+            margin: 0; 
+            overflow: hidden;
+        }
+
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            flex-direction: column; text-align: center;
+            background-color: rgba(10, 25, 47, 0.95);
+            z-index: 100; opacity: 0; visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .overlay.active { opacity: 1; visibility: visible; }
+        .content { padding: 20px; }
+        h1 { font-size: 2.8rem; color: white; margin-bottom: 1rem; }
+        p { font-size: 1.2rem; margin-bottom: 2.5rem; max-width: 500px; }
+
+        .button-container {
+            display: flex; flex-direction: column; gap: 15px;
+            width: 100%; max-width: 350px; margin: 0 auto;
+        }
+
+        .action-button {
+            background: transparent; color: var(--accent); padding: 18px 30px;
+            font-size: 1rem; font-weight: bold; cursor: pointer;
+            border: 2px solid var(--accent); border-radius: 8px;
+            transition: background-color 0.3s, color 0.3s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .action-button:hover, .action-button:focus { background-color: var(--accent-dark); outline: none; }
+        #video-overlay { z-index: 1001; }
+        #anniversary-video { width: 95%; max-width: 900px; border-radius: 12px; border: 2px solid var(--accent); }
+        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 45px; font-weight: bold; color: white; cursor: pointer; line-height: 1; }
+        #ar-instructions { z-index: 50; background: rgba(10, 25, 47, 0.8); }
+        .marker-preview { max-width: 150px; border: 3px solid var(--accent); border-radius: 8px; margin-top: 1rem; }
+
+        .loader-content p { margin-top: 20px; font-size: 1.1rem; color: var(--accent); }
+        .spinner {
+            border: 6px solid var(--accent-dark); border-top: 6px solid var(--accent);
+            border-radius: 50%; width: 60px; height: 60px;
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @media (min-width: 768px) { .button-container { flex-direction: row; justify-content: center; } }
     </style>
-  </head>
-  <body style='margin : 0px; overflow: hidden;'>
-    <!-- صفحه شروع -->
-    <div class="container" id="start-container">
-      <h1>Anniversary Experience</h1>
-      <p>Watch a special video or start the AR gallery.</p>
-      <div class="button-container">
-        <button class="action-button" id="watch-video-button">Watch Video</button>
-        <button class="action-button" id="start-ar-button">Start AR Gallery</button>
-      </div>
+</head>
+
+<body>
+    <div id="loader" class="overlay active">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <p>در حال آماده‌سازی جادو...</p>
+        </div>
     </div>
 
-    <!-- پخش‌کننده ویدیو -->
-    <div class="video-overlay" id="video-overlay">
-        <span class="close-video" id="close-video">&times;</span>
-        <video id="anniversary-video" controls>
-            <source src="YOUR_VIDEO_LINK_GOES_HERE.mp4" type="video/mp4">
-            Your browser does not support the video tag.
+    <div id="start-container" class="overlay">
+        <div class="content">
+            <h1>سالگرد عشقمون مبارک</h1>
+            <p>یک خاطره رو انتخاب کن</p>
+            <div class="button-container">
+                <button id="watch-video-btn" class="action-button">🎬 تماشای کلیپ خاطرات</button>
+                <button id="start-ar-btn" class="action-button">✨ گالری عکس‌های جادویی</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="video-overlay" class="overlay">
+        <span id="close-video-btn" class="close-btn">&times;</span>
+        <video id="anniversary-video" controls preload="metadata">
+            <source src="YOUR_VIDEO_LINK.mp4" type="video/mp4">
+            مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.
         </video>
     </div>
 
-    <!-- صحنه AR -->
+    <div id="ar-instructions" class="overlay">
+        <div class="content">
+            <p>دوربین را به سمت نشانگر زیر عکس اصلی بگیرید</p>
+            <img src="YOUR_MARKER_IMAGE_LINK.png" alt="Marker Example" class="marker-preview">
+        </div>
+    </div>
+
     <a-scene
         id="ar-scene"
         vr-mode-ui="enabled: false;"
-        embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
-        
-        <a-assets>
-          <img id="photo1" src="https://placehold.co/800x800/0a192f/64ffda?text=Photo+1" crossorigin="anonymous">
-          <img id="photo2" src="https://placehold.co/800x800/0a192f/64ffda?text=Photo+2" crossorigin="anonymous">
-          <img id="photo3" src="https://placehold.co/800x800/0a192f/64ffda?text=Photo+3" crossorigin="anonymous">
-          <img id="photo4" src="https://placehold.co/800x800/0a192f/64ffda?text=Photo+4" crossorigin="anonymous">
-          <img id="photo5" src="https://placehold.co/800x800/0a192f/64ffda?text=Photo+5" crossorigin="anonymous">
+        renderer="logarithmicDepthBuffer: true; colorManagement: true;"
+        arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
+        style="display: none;">
+
+        <a-assets timeout="30000">
+            <img id="photo1" src="https://placehold.co/800x800/e74c3c/ffffff?text=Photo+1" crossorigin="anonymous">
+            <img id="photo2" src="https://placehold.co/800x800/3498db/ffffff?text=Photo+2" crossorigin="anonymous">
+            <img id="photo3" src="https://placehold.co/800x800/2ecc71/ffffff?text=Photo+3" crossorigin="anonymous">
+            <img id="photo4" src="https://placehold.co/800x800/f1c40f/ffffff?text=Photo+4" crossorigin="anonymous">
+            <img id="photo5" src="https://placehold.co/800x800/9b59b6/ffffff?text=Photo+5" crossorigin="anonymous">
+            
+            <img id="frame-bg" src="https://i.imgur.com/gRh0nWh.png" crossorigin="anonymous">
         </a-assets>
 
-        <!-- نشانگر الگو با تنظیمات پایداری -->
-        <a-marker type='pattern' url='./marker/pattern-marker.patt' smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2">
-            
-            <!-- این گروه کل عکس‌ها را حدود 30 سانت بالای مارکر قرار می‌دهد (position y=0.3) -->
-            <a-entity position="0 0.3 0">
-                
-                <!-- عکس اصلی (تقریباً اندازه A4) در مرکز. مقیاس: عرض 21 سانت و ارتفاع 30 سانت -->
-                <a-plane src="#photo1" scale="0.21 0.3 1" position="0 0 0" rotation="-90 0 0"></a-plane>
-
-                <!-- عکس‌های دیگر با مقیاس و موقعیت‌های جدید و واقعی -->
-                <a-plane src="#photo2" scale="0.15 0.15 1" position="-0.2 0.05 0" rotation="-90 0 0"></a-plane>
-                <a-plane src="#photo3" scale="0.18 0.12 1" position="0.25 -0.05 0" rotation="-90 0 0"></a-plane>
-                <a-plane src="#photo4" scale="0.1 0.1 1" position="-0.1 0.2 0" rotation="-90 0 10"></a-plane>
-                <a-plane src="#photo5" scale="0.12 0.12 1" position="0.15 -0.2 0" rotation="-90 0 -5"></a-plane>
+        <a-marker id="animated-marker" type="pattern" url="YOUR_PATTERN_MARKER_LINK.patt" smooth="true" smoothCount="5">
+            <a-entity id="gallery-container" position="0 0.1 0" scale="0 0 0" visible="false" animation__scale="property: scale; to: 1 1 1; dur: 1500; easing: easeOutElastic; startEvents: markerFound" animation__rotation="property: rotation; from: -90 0 90; to: -90 0 0; dur: 1000; delay: 500; easing: easeOutCubic; startEvents: markerFound">
+                <a-entity position="0 0 0">
+                    <a-plane material="src: #photo1" width="0.8" height="0.8" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #frame-bg; transparent: true;" width="0.88" height="0.88" position="0 0 0"></a-plane>
+                </a-entity>
+                <a-entity position="-0.8 0.5 0" rotation="0 0 -15">
+                    <a-plane material="src: #photo2" width="0.5" height="0.5" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #frame-bg; transparent: true;" width="0.58" height="0.58" position="0 0 0"></a-plane>
+                </a-entity>
+                <a-entity position="0.8 0.4 0" rotation="0 0 12">
+                    <a-plane material="src: #photo3" width="0.5" height="0.6" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #frame-bg; transparent: true;" width="0.58" height="0.68" position="0 0 0"></a-plane>
+                </a-entity>
+                <a-entity position="-0.6 -0.6 0" rotation="0 0 10">
+                    <a-plane material="src: #photo4" width="0.45" height="0.45" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #frame-bg; transparent: true;" width="0.53" height="0.53" position="0 0 0"></a-plane>
+                </a-entity>
+                <a-entity position="0.7 -0.7 0" rotation="0 0 -18">
+                    <a-plane material="src: #photo5" width="0.5" height="0.5" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #frame-bg; transparent: true;" width="0.58" height="0.58" position="0 0 0"></a-plane>
+                </a-entity>
             </a-entity>
-
         </a-marker>
-
         <a-entity camera></a-entity>
     </a-scene>
 
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const startArButton = document.getElementById('start-ar-button');
-        const watchVideoButton = document.getElementById('watch-video-button');
-        const startContainer = document.getElementById('start-container');
-        const videoOverlay = document.getElementById('video-overlay');
-        const videoPlayer = document.getElementById('anniversary-video');
-        const closeVideoButton = document.getElementById('close-video');
-        
-        startArButton.addEventListener('click', () => {
-          startContainer.style.display = 'none';
-        });
+        // --- کدهای JavaScript ---
+        window.addEventListener('load', () => {
+            const elements = {
+                loader: document.getElementById('loader'),
+                startContainer: document.getElementById('start-container'),
+                arScene: document.getElementById('ar-scene'),
+                watchVideoBtn: document.getElementById('watch-video-btn'),
+                startArBtn: document.getElementById('start-ar-btn'),
+                videoOverlay: document.getElementById('video-overlay'),
+                videoPlayer: document.getElementById('anniversary-video'),
+                closeVideoBtn: document.getElementById('close-video-btn'),
+                arInstructions: document.getElementById('ar-instructions'),
+                marker: document.getElementById('animated-marker'),
+                galleryContainer: document.getElementById('gallery-container')
+            };
 
-        watchVideoButton.addEventListener('click', () => {
-          videoOverlay.style.display = 'flex';
-          videoPlayer.play();
-        });
+            elements.loader.classList.remove('active');
+            elements.startContainer.classList.add('active');
 
-        closeVideoButton.addEventListener('click', () => {
-          videoOverlay.style.display = 'none';
-          videoPlayer.pause();
+            elements.watchVideoBtn.addEventListener('click', () => {
+                elements.videoOverlay.classList.add('active');
+                elements.videoPlayer.play();
+            });
+
+            elements.closeVideoBtn.addEventListener('click', () => {
+                elements.videoOverlay.classList.remove('active');
+                elements.videoPlayer.pause();
+                elements.videoPlayer.currentTime = 0;
+            });
+
+            elements.startArBtn.addEventListener('click', () => {
+                elements.startContainer.classList.remove('active');
+                elements.arScene.style.display = 'block';
+                elements.arInstructions.classList.add('active');
+                setTimeout(() => {
+                    elements.arInstructions.classList.remove('active');
+                }, 5000);
+            });
+
+            elements.marker.addEventListener('markerFound', () => {
+                elements.galleryContainer.setAttribute('visible', 'true');
+            });
+
+            elements.marker.addEventListener('markerLost', () => {
+                elements.galleryContainer.setAttribute('visible', 'false');
+            });
         });
-      });
     </script>
-  </body>
+</body>
 </html>
-
