@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Our Memories | AR Experience</title>
 
+    <!-- A-Frame and AR.js Libraries -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
@@ -17,7 +18,6 @@
             --text-light: #ccd6f6;
             --accent: #64ffda;
             --accent-dark: rgba(100, 255, 218, 0.1);
-            --test-button-bg: #f1c40f; /* Yellow for the test button */
         }
 
         body {
@@ -28,216 +28,153 @@
             overflow: hidden;
         }
 
+        /* The overlays are now used to show/hide content */
         .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            display: none; /* Hidden by default */
-            justify-content: center; align-items: center;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
             flex-direction: column; text-align: center;
-            background-color: rgba(10, 25, 47, 0.95);
-            z-index: 100; opacity: 0; visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            background-color: var(--primary-bg);
+            z-index: 10;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        
+        .overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
         }
 
-        .overlay.active { display: flex; opacity: 1; visibility: visible; }
-        .content { padding: 20px; }
         h1 { font-size: 2.8rem; color: white; margin-bottom: 1rem; }
         p { font-size: 1.2rem; margin-bottom: 2.5rem; max-width: 500px; }
-
-        .button-container {
-            display: flex; flex-direction: column; gap: 15px;
-            width: 100%; max-width: 350px; margin: 0 auto;
-        }
-
+        .button-container { display: flex; gap: 20px; }
         .action-button {
             background: transparent; color: var(--accent); padding: 18px 30px;
             font-size: 1rem; font-weight: bold; cursor: pointer;
             border: 2px solid var(--accent); border-radius: 8px;
-            transition: background-color 0.3s, color 0.3s;
-            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.3s;
         }
-        
-        #test-ar-btn {
-            color: var(--primary-bg);
-            border-color: var(--test-button-bg);
-            background-color: var(--test-button-bg);
-        }
-
-        .action-button:hover, .action-button:focus { background-color: var(--accent-dark); outline: none; }
         #video-overlay { z-index: 1001; }
-        #anniversary-video { width: 95%; max-width: 900px; border-radius: 12px; border: 2px solid var(--accent); }
-        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 45px; font-weight: bold; color: white; cursor: pointer; line-height: 1; }
-        #ar-instructions, #test-instructions { z-index: 50; background: rgba(10, 25, 47, 0.8); }
-        .marker-preview { max-width: 150px; border: 3px solid var(--accent); border-radius: 8px; margin-top: 1rem; }
-
-        .loader-content p { margin-top: 20px; font-size: 1.1rem; color: var(--accent); }
-        .spinner {
-            border: 6px solid var(--accent-dark); border-top: 6px solid var(--accent);
-            border-radius: 50%; width: 60px; height: 60px;
-            animation: spin 1.5s linear infinite;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @media (min-width: 768px) { .button-container { flex-direction: column; align-items: center;} }
+        #anniversary-video { width: 95%; max-width: 900px; border-radius: 12px; }
+        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 45px; font-weight: bold; color: white; cursor: pointer; }
     </style>
 </head>
 
 <body>
-    <div id="loader" class="overlay active">
-        <div class="loader-content">
-            <div class="spinner"></div>
-            <p>Preparing the magic...</p>
-        </div>
-    </div>
-
+    <!-- Start Page and Video player are overlays -->
     <div id="start-container" class="overlay">
-        <div class="content">
-            <h1>Happy Anniversary</h1>
-            <p>Choose an experience</p>
-            <div class="button-container">
-                <button id="watch-video-btn" class="action-button">🎬 Watch Our Video</button>
-                <button id="start-ar-btn" class="action-button">✨ Start AR Gallery</button>
-                <button id="test-ar-btn" class="action-button">🛠️ Test AR Marker</button>
-            </div>
+        <h1>Happy Anniversary</h1>
+        <p>Choose an experience</p>
+        <div class="button-container">
+            <button id="watch-video-btn" class="action-button">🎬 Watch Video</button>
+            <button id="start-ar-btn" class="action-button">✨ Start AR Gallery</button>
         </div>
     </div>
 
-    <div id="video-overlay" class="overlay">
+    <div id="video-overlay" class="overlay hidden">
         <span id="close-video-btn" class="close-btn">&times;</span>
-        <video id="anniversary-video" controls preload="metadata">
+        <video id="anniversary-video" controls>
+             <!-- ❗️❗️ PASTE YOUR VIDEO LINK HERE ❗️❗️ -->
             <source src="YOUR_VIDEO_LINK.mp4" type="video/mp4">
         </video>
     </div>
 
-    <div id="main-ar-view" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;">
-        <div id="ar-instructions" class="overlay active">
-             <div class="content">
-                <p>Point camera at your custom marker</p>
-                <img src="YOUR_MARKER_IMAGE_LINK.png" alt="Marker Example" class="marker-preview">
-            </div>
-        </div>
-        <a-scene id="ar-scene" vr-mode-ui="enabled: false;" renderer="logarithmicDepthBuffer: true;" arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3;" embedded>
-            <a-assets timeout="30000">
-                <img id="empty-frame" src="https://i.imgur.com/aC3z2G5.png" crossorigin="anonymous">
-                <img id="real-photo-1" src="https://placehold.co/800x1000/3498db/FFFFFF?text=Photo+1" crossorigin="anonymous">
-                <img id="real-photo-2" src="https://placehold.co/800x600/e74c3c/FFFFFF?text=Photo+2" crossorigin="anonymous">
-                <img id="real-photo-3" src="https://placehold.co/800x600/2ecc71/FFFFFF?text=Photo+3" crossorigin="anonymous">
-                <img id="real-photo-4" src="https://placehold.co/800x600/f1c40f/FFFFFF?text=Photo+4" crossorigin="anonymous">
-                <img id="real-photo-5" src="https://placehold.co/800x1000/9b59b6/FFFFFF?text=Photo+5" crossorigin="anonymous">
-            </a-assets>
-            <a-marker id="animated-marker" type='pattern' url='./marker/pattern-marker.patt' smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2">
-                <a-entity id="gallery-container" position="0 0.6 0" scale="0 0 0" visible="false" animation="property: scale; to: 1 1 1; dur: 1500; easing: easeOutElastic; startEvents: markerFound">
-                    <a-entity position="-1.0 0.6 0" rotation="-90 0 10"><a-plane class="photo-plane" material="src: #real-photo-1; transparent: true; opacity: 0;" width="0.72" height="0.9" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="1.0"></a-plane></a-entity>
-                    <a-entity position="0 0.8 0" rotation="-90 0 0"><a-plane class="photo-plane" material="src: #real-photo-2; transparent: true; opacity: 0;" width="0.81" height="0.54" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.9" height="0.6"></a-plane></a-entity>
-                    <a-entity position="1.0 0.7 0" rotation="-90 0 0"><a-plane class="photo-plane" material="src: #real-photo-3; transparent: true; opacity: 0;" width="0.72" height="0.48" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="0.53"></a-plane></a-entity>
-                    <a-entity position="-1.0 -0.4 0" rotation="-90 0 0"><a-plane class="photo-plane" material="src: #real-photo-4; transparent: true; opacity: 0;" width="0.81" height="0.54" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.9" height="0.6"></a-plane></a-entity>
-                    <a-entity position="1.0 -0.2 0" rotation="-90 0 -5"><a-plane class="photo-plane" material="src: #real-photo-5; transparent: true; opacity: 0;" width="0.72" height="0.9" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="1.0"></a-plane></a-entity>
-                </a-entity>
-            </a-marker>
-            <a-entity camera></a-entity>
-        </a-scene>
-        <span id="close-ar-btn" class="close-btn">&times;</span>
-    </div>
+    <!-- THIS IS YOUR ORIGINAL, WORKING AR SCENE STRUCTURE -->
+    <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
+        
+        <a-assets timeout="30000">
+            <img id="empty-frame" src="https://i.imgur.com/aC3z2G5.png" crossorigin="anonymous">
+            <!-- ❗️❗️ PASTE YOUR REAL PHOTO LINKS HERE ❗️❗️ -->
+            <img id="real-photo-1" src="YOUR_PHOTO_1_LINK.jpg" crossorigin="anonymous">
+            <img id="real-photo-2" src="YOUR_PHOTO_2_LINK.jpg" crossorigin="anonymous">
+            <img id="real-photo-3" src="YOUR_PHOTO_3_LINK.jpg" crossorigin="anonymous">
+            <img id="real-photo-4" src="YOUR_PHOTO_4_LINK.jpg" crossorigin="anonymous">
+            <img id="real-photo-5" src="YOUR_PHOTO_5_LINK.jpg" crossorigin="anonymous">
+        </a-assets>
 
-    <div id="hiro-test-view" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;">
-        <div id="test-instructions" class="overlay active">
-             <div class="content">
-                <p>Point camera at the Hiro marker</p>
-                <img src="https://jeromeetienne.github.io/AR.js-docs/images/HIRO.png" alt="Hiro Marker" class="marker-preview">
-            </div>
-        </div>
-        <a-scene id="hiro-scene" vr-mode-ui="enabled: false;" arjs="sourceType: webcam;" embedded>
-            <a-marker preset="hiro">
-                <a-box position="0 0.5 0" material="color: red;"></a-box>
-            </a-marker>
-            <a-entity camera></a-entity>
-        </a-scene>
-        <span id="close-test-btn" class="close-btn">&times;</span>
-    </div>
+        <!-- Using your marker settings -->
+        <a-marker id="main-marker" type='pattern' url='./marker/pattern-marker.patt' smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2">
+            
+            <a-entity 
+                id="gallery-container"
+                position="0 0.6 0" 
+                scale="1 1 1"
+                visible="false">
+
+                <!-- Frame 1 (Top Left) -->
+                <a-entity position="-1.0 0.6 0" rotation="-90 0 10">
+                    <a-plane class="photo-plane" material="src: #real-photo-1; transparent: true; opacity: 1;" width="0.72" height="0.9" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="1.0"></a-plane>
+                </a-entity>
+                
+                <!-- Frame 2 (Top Middle) -->
+                <a-entity position="0 0.8 0" rotation="-90 0 0">
+                    <a-plane class="photo-plane" material="src: #real-photo-2; transparent: true; opacity: 1;" width="0.81" height="0.54" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #empty-frame; transparent: true;" width="0.9" height="0.6"></a-plane>
+                </a-entity>
+                
+                <!-- Frame 3 (Top Right) -->
+                <a-entity position="1.0 0.7 0" rotation="-90 0 0">
+                    <a-plane class="photo-plane" material="src: #real-photo-3; transparent: true; opacity: 1;" width="0.72" height="0.48" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="0.53"></a-plane>
+                </a-entity>
+                
+                <!-- Frame 4 (Bottom Left) -->
+                <a-entity position="-1.0 -0.4 0" rotation="-90 0 0">
+                    <a-plane class="photo-plane" material="src: #real-photo-4; transparent: true; opacity: 1;" width="0.81" height="0.54" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #empty-frame; transparent: true;" width="0.9" height="0.6"></a-plane>
+                </a-entity>
+                
+                <!-- Frame 5 (Middle Right) -->
+                <a-entity position="1.0 -0.2 0" rotation="-90 0 -5">
+                    <a-plane class="photo-plane" material="src: #real-photo-5; transparent: true; opacity: 1;" width="0.72" height="0.9" position="0 0 0.01"></a-plane>
+                    <a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="1.0"></a-plane>
+                </a-entity>
+
+            </a-entity>
+        </a-marker>
+        <a-entity camera></a-entity>
+    </a-scene>
 
     <script>
-        window.addEventListener('load', () => {
-            // --- DOM Elements ---
-            const elements = {
-                loader: document.getElementById('loader'),
-                startContainer: document.getElementById('start-container'),
-                videoOverlay: document.getElementById('video-overlay'),
-                videoPlayer: document.getElementById('anniversary-video'),
-                
-                mainArView: document.getElementById('main-ar-view'),
-                arInstructions: document.getElementById('ar-instructions'),
-                marker: document.getElementById('animated-marker'),
-                galleryContainer: document.getElementById('gallery-container'),
-                photoPlanes: document.querySelectorAll('.photo-plane'),
-
-                hiroTestView: document.getElementById('hiro-test-view'),
-                testInstructions: document.getElementById('test-instructions'),
-
-                // Buttons
-                watchVideoBtn: document.getElementById('watch-video-btn'),
-                startArBtn: document.getElementById('start-ar-btn'),
-                testArBtn: document.getElementById('test-ar-btn'),
-                closeVideoBtn: document.getElementById('close-video-btn'),
-                closeArBtn: document.getElementById('close-ar-btn'),
-                closeTestBtn: document.getElementById('close-test-btn'),
-            };
-
-            // --- Initial Setup ---
-            elements.loader.classList.remove('active');
-            elements.startContainer.classList.add('active');
-
-            // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const startContainer = document.getElementById('start-container');
+            const videoOverlay = document.getElementById('video-overlay');
+            const videoPlayer = document.getElementById('anniversary-video');
+            const startArBtn = document.getElementById('start-ar-btn');
+            const watchVideoBtn = document.getElementById('watch-video-btn');
+            const closeVideoBtn = document.getElementById('close-video-btn');
             
-            // Video Player
-            elements.watchVideoBtn.addEventListener('click', () => {
-                elements.startContainer.classList.remove('active');
-                elements.videoOverlay.classList.add('active');
-                elements.videoPlayer.play();
-            });
-            elements.closeVideoBtn.addEventListener('click', () => {
-                elements.videoOverlay.classList.remove('active');
-                elements.videoPlayer.pause();
-                elements.videoPlayer.currentTime = 0;
-                elements.startContainer.classList.add('active');
+            const marker = document.getElementById('main-marker');
+            const gallery = document.getElementById('gallery-container');
+
+            // Hide the gallery initially
+            gallery.setAttribute('visible', 'false');
+
+            // When marker is found, show the gallery
+            marker.addEventListener('markerFound', () => {
+                gallery.setAttribute('visible', 'true');
             });
 
-            // Main AR Gallery
-            elements.startArBtn.addEventListener('click', () => {
-                elements.startContainer.classList.remove('active');
-                elements.mainArView.style.display = 'block';
-                setTimeout(() => { elements.arInstructions.classList.remove('active'); }, 5000);
-            });
-            elements.closeArBtn.addEventListener('click', () => {
-                elements.mainArView.style.display = 'none';
-                elements.startContainer.classList.add('active');
+            // When marker is lost, hide the gallery
+            marker.addEventListener('markerLost', () => {
+                gallery.setAttribute('visible', 'false');
             });
 
-            // Hiro Marker Test
-            elements.testArBtn.addEventListener('click', () => {
-                elements.startContainer.classList.remove('active');
-                elements.hiroTestView.style.display = 'block';
-                 setTimeout(() => { elements.testInstructions.classList.remove('active'); }, 5000);
-            });
-             elements.closeTestBtn.addEventListener('click', () => {
-                elements.hiroTestView.style.display = 'none';
-                elements.startContainer.classList.add('active');
+            // Button to start AR: just hides the start screen
+            startArBtn.addEventListener('click', () => {
+                startContainer.classList.add('hidden');
             });
 
-
-            // --- AR Logic for Main Scene ---
-            elements.marker.addEventListener('markerFound', () => {
-                elements.galleryContainer.setAttribute('visible', 'true');
-                elements.photoPlanes.forEach(plane => {
-                    plane.setAttribute('animation', {
-                        property: 'material.opacity', to: 1, dur: 1500, delay: 700, easing: 'easeInOutQuad'
-                    });
-                });
+            // Button to watch video
+            watchVideoBtn.addEventListener('click', () => {
+                videoOverlay.classList.remove('hidden');
+                videoPlayer.play();
             });
-            elements.marker.addEventListener('markerLost', () => {
-                elements.galleryContainer.setAttribute('visible', 'false');
-                elements.photoPlanes.forEach(plane => {
-                    plane.removeAttribute('animation');
-                    plane.setAttribute('material', 'opacity', 0);
-                });
+
+            // Button to close video
+            closeVideoBtn.addEventListener('click', () => {
+                videoOverlay.classList.add('hidden');
+                videoPlayer.pause();
             });
         });
     </script>
