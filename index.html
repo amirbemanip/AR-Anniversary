@@ -124,8 +124,8 @@
           frame.setAttribute('width', '0.7');
           frame.setAttribute('height', '0.55');
           frame.setAttribute('position', `0 0 0.01`); // کمی عقب‌تر از عکس قرار می‌گیرد
-          frame.setAttribute('material', 'color: #c29416; transparent: true; opacity: 0;'); // رنگ طلایی
-          frame.setAttribute('animation', `property: material.opacity; from: 0; to: 1; dur: 1500; easing: easeInSine`);
+          frame.setAttribute('material', 'color: #C0C0C0; transparent: true; opacity: 0;'); // رنگ نقره‌ای
+          frame.setAttribute('animation', `property: material.opacity; from: 0; to: 1; dur: 2000; easing: easeInSine`);
           
           // ایجاد عکس
           const photo = document.createElement('a-image');
@@ -134,7 +134,7 @@
           photo.setAttribute('height', '0.45');
           photo.setAttribute('position', `0 0 0.02`); // کمی جلوتر از قاب قرار می‌گیرد
           photo.setAttribute('material', 'shader: standard; metalness: 0.1; roughness: 0.8; transparent: true; opacity: 0;');
-          photo.setAttribute('animation', `property: material.opacity; from: 0; to: 1; dur: 2000; easing: easeInSine`);
+          photo.setAttribute('animation', `property: material.opacity; from: 0; to: 1; dur: 3000; easing: easeInSine`);
           
           // اضافه کردن عکس و قاب به موجودیت اصلی
           container.appendChild(frame);
