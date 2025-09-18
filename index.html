@@ -30,7 +30,7 @@
       font-size: 1.2rem;
       text-align: center;
       animation: fadeOut 2s forwards;
-      animation-delay: 5s; /* صفحه لودینگ 5 ثانیه نمایش داده شود */
+      animation-delay: 5s;
     }
 
     #loading-screen p {
@@ -138,25 +138,30 @@
                 this.container.setAttribute('rotation', `0 0 ${this.config.rot}`);
                 this.container.setAttribute('visible', 'false');
 
+                // قاب
                 this.frame = document.createElement('a-plane');
                 this.frame.setAttribute('width', `${this.config.scale.width + 0.1}`);
                 this.frame.setAttribute('height', `${this.config.scale.height + 0.1}`);
-                this.frame.setAttribute('material', 'color: #C0C0C0; shader: flat; opacity: 0;');
+                this.frame.setAttribute('color', '#C0C0C0');
+                this.frame.setAttribute('opacity', '0');
 
                 const frameShadow = document.createElement('a-plane');
                 frameShadow.setAttribute('width', `${this.config.scale.width + 0.15}`);
                 frameShadow.setAttribute('height', `${this.config.scale.height + 0.15}`);
                 frameShadow.setAttribute('position', `0.02 -0.02 -0.01`);
-                frameShadow.setAttribute('material', 'color: #000; transparent: true; opacity: 0.2;');
+                frameShadow.setAttribute('color', '#000');
+                frameShadow.setAttribute('opacity', '0.2');
+                frameShadow.setAttribute('transparent', 'true');
                 this.container.appendChild(frameShadow);
                 this.container.appendChild(this.frame);
 
+                // عکس
                 this.photo = document.createElement('a-image');
                 this.photo.setAttribute('src', this.src);
                 this.photo.setAttribute('width', `${this.config.scale.width}`);
                 this.photo.setAttribute('height', `${this.config.scale.height}`);
                 this.photo.setAttribute('position', `0 0 0.02`);
-                this.photo.setAttribute('material', 'shader: standard; metalness: 0.1; roughness: 0.8; opacity: 0;');
+                this.photo.setAttribute('opacity', '0');
 
                 this.container.appendChild(this.photo);
                 photoContainer.appendChild(this.container);
@@ -172,8 +177,8 @@
                                 clearInterval(interval);
                             } else {
                                 opacity += 0.05;
-                                this.photo.setAttribute('material', 'opacity', opacity);
-                                this.frame.setAttribute('material', 'opacity', opacity);
+                                this.photo.setAttribute('opacity', opacity);
+                                this.frame.setAttribute('opacity', opacity);
                             }
                         }, 50);
                     }, this.config.delay);
