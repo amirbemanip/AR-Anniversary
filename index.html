@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <title>یادگاری ما - واقعیت افزوده (نسخه اصلاح شده)</title>
+    <title>یادگاری ما - چیدمان سفارشی</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; background-color: #000; color: #fff; overflow: hidden; direction: rtl; }
-        #loading-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: rgba(0, 0, 0, 0.9); z-index: 1000; font-size: 1.2rem; text-align: center; animation: fadeOut 2s forwards; animation-delay: 5s; }
+        #loading-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align: items: center; background-color: rgba(0, 0, 0, 0.9); z-index: 1000; font-size: 1.2rem; text-align: center; animation: fadeOut 2s forwards; animation-delay: 5s; }
         #loading-screen p { background-color: rgba(255, 255, 255, 0.2); padding: 10px 20px; border-radius: 10px; backdrop-filter: blur(5px); }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
         .instruction-box { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: rgba(0, 0, 0, 0.7); padding: 15px; border-radius: 15px; color: #fff; text-align: center; font-size: 1rem; z-index: 999; backdrop-filter: blur(5px); }
@@ -16,55 +16,77 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.0/dist/mindar-image-aframe.prod.js"></script>
 
     <script>
-        AFRAME.registerComponent('media-layout', {
+        AFRAME.registerComponent('custom-layout', {
             init: function() {
                 const targetEntity = this.el;
 
+                // ===============================================================
+                // بخش تنظیمات اصلی - اینجا را برای تغییر موقعیت ویرایش کنید
+                // ===============================================================
                 const mediaItems = [
-                    { type: 'image', src: "https://placehold.co/600x600/6A5ACD/white?text=Image+1", width: 0.8, height: 0.8 },
-                    { type: 'image', src: "https://placehold.co/800x600/4682B4/white?text=Image+2", width: 1, height: 0.75 },
-                    { type: 'video', src: "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_stereo.mp4", width: 1.2, height: 0.9 },
-                    { type: 'image', src: "https://placehold.co/600x800/2E8B57/white?text=Image+4", width: 0.75, height: 1 },
-                    { type: 'image', src: "https://placehold.co/600x600/8FBC8F/white?text=Image+5", width: 0.8, height: 0.8 },
+                    // آیتم 1: مربع کوچک در بالا وسط
+                    { 
+                        type: 'image', src: "https://placehold.co/600x600/FFFFFF/black?text=1", 
+                        width: 0.6, height: 0.6, 
+                        pos: { x: 0, y: 1.2, z: 0 }, 
+                        rot: { x: 0, y: 0, z: 0 } 
+                    },
+                    // آیتم 2: مستطیل افقی در بالا چپ
+                    { 
+                        type: 'image', src: "https://placehold.co/800x600/6A5ACD/white?text=2", 
+                        width: 1.0, height: 0.75, 
+                        pos: { x: -0.8, y: 0.5, z: 0 }, 
+                        rot: { x: 0, y: 0, z: 0 } 
+                    },
+                    // آیتم 3: مستطیل افقی در بالا راست (ویدئو)
+                    { 
+                        type: 'video', src: "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_stereo.mp4", 
+                        width: 1.0, height: 0.75, 
+                        pos: { x: 0.8, y: 0.5, z: 0 }, 
+                        rot: { x: 0, y: 0, z: 0 } 
+                    },
+                    // آیتم 4: مستطیل عمودی در پایین چپ
+                    { 
+                        type: 'image', src: "https://placehold.co/600x800/4682B4/white?text=4", 
+                        width: 0.75, height: 1.0, 
+                        pos: { x: -1.1, y: -0.5, z: 0 }, 
+                        rot: { x: 0, y: 0, z: 0 } 
+                    },
+                    // آیتم 5: مستطیل عمودی در پایین راست
+                    { 
+                        type: 'image', src: "https://placehold.co/600x800/2E8B57/white?text=5", 
+                        width: 0.75, height: 1.0, 
+                        pos: { x: 1.1, y: -0.5, z: 0 }, 
+                        rot: { x: 0, y: 0, z: 0 } 
+                    },
                 ];
-
-                const radius = 1.8;
-                const angleSpread = 140; 
-
-                const numItems = mediaItems.length;
+                // ===============================================================
 
                 mediaItems.forEach((item, index) => {
-                    const angleDeg = (index / (numItems - 1) - 0.5) * angleSpread;
-                    const angleRad = angleDeg * (Math.PI / 180);
-                    
-                    const x = radius * Math.sin(angleRad);
-                    const y = radius * Math.cos(angleRad) * 0.5 + 0.5;
-                    const z = 0.1;
-                    const rot = -angleDeg;
-
-                    const container = createFramedMedia(item, {x, y, z, rot}, index);
+                    const container = createFramedMedia(item, index);
                     targetEntity.appendChild(container);
                 });
 
-                function createFramedMedia(item, pos, index) {
+                function createFramedMedia(item, index) {
                     const container = document.createElement('a-entity');
-                    container.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
-                    container.setAttribute('rotation', `0 0 ${pos.rot}`);
+                    // استفاده مستقیم از مقادیر pos و rot از آبجکت
+                    container.setAttribute('position', `${item.pos.x} ${item.pos.y} ${item.pos.z}`);
+                    container.setAttribute('rotation', `${item.rot.x} ${item.rot.y} ${item.rot.z}`);
 
                     const frameWidth = item.width * 1.1;
                     const frameHeight = item.height * 1.1;
-                    const animationDelay = 500 + index * 300;
+                    const animationDelay = 300 + index * 200;
 
                     const shadow = document.createElement('a-plane');
                     shadow.setAttribute('width', frameWidth);
                     shadow.setAttribute('height', frameHeight);
-                    shadow.setAttribute('position', `0 0 -0.02`);
+                    shadow.setAttribute('position', '0 0 -0.02');
                     shadow.setAttribute('material', 'color: #000; transparent: true; opacity: 0.5;');
 
                     const frame = document.createElement('a-plane');
                     frame.setAttribute('width', frameWidth);
                     frame.setAttribute('height', frameHeight);
-                    frame.setAttribute('position', `0 0 -0.01`);
+                    frame.setAttribute('position', '0 0 -0.01');
                     frame.setAttribute('material', 'color: white;');
                     
                     let mediaElement;
@@ -83,9 +105,9 @@
                     }
                     mediaElement.setAttribute('width', item.width);
                     mediaElement.setAttribute('height', item.height);
-                    mediaElement.setAttribute('position', `0 0 0`);
+                    mediaElement.setAttribute('position', '0 0 0');
 
-                    container.setAttribute('animation__scale', `property: scale; from: 0 0 0; to: 1 1 1; dur: 1200; easing: easeInOutQuad; delay: ${animationDelay}`);
+                    container.setAttribute('animation__scale', `property: scale; from: 0 0 0; to: 1 1 1; dur: 1000; easing: easeOutBack; delay: ${animationDelay}`);
                     
                     container.appendChild(shadow);
                     container.appendChild(frame);
@@ -117,7 +139,7 @@
         
         <a-camera mindar-image-camera=""></a-camera>
 
-        <a-entity mindar-image-target="targetIndex: 0" media-layout>
+        <a-entity mindar-image-target="targetIndex: 0" custom-layout>
         </a-entity>
 
     </a-scene>
