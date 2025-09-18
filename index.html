@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-    <title>Our Memory - AR Experience (Final)</title>
+    <title>Our Memory - AR Experience (Final Position)</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -32,41 +32,41 @@
             init: function() {
                 const targetEntity = this.el;
 
-                // Positions reverted to the state before the 50% global increase
+                // A constant value has been added to the 'y' position of all items to move them up.
                 const mediaItems = [
                     // Item 1
                     { 
                         type: 'image', src: "https://placehold.co/600x600/FFFFFF/black?text=1", 
                         width: 0.6, height: 0.6, 
-                        pos: { x: 0, y: 1.8425, z: 0 }, 
+                        pos: { x: 0, y: 2.5925, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
                     // Item 2
                     { 
                         type: 'image', src: "https://placehold.co/800x600/6A5ACD/white?text=2", 
                         width: 1.5, height: 1.125,
-                        pos: { x: -0.88, y: 0.7906, z: 0 }, 
+                        pos: { x: -0.88, y: 1.5406, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
                     // Item 3 (Video)
                     { 
                         type: 'video', src: "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_stereo.mp4", 
                         width: 1.5, height: 1.125,
-                        pos: { x: 0.88, y: 0.7906, z: 0 }, 
+                        pos: { x: 0.88, y: 1.5406, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
                     // Item 4
                     { 
                         type: 'image', src: "https://placehold.co/600x800/4682B4/white?text=4", 
                         width: 1.125, height: 1.5,
-                        pos: { x: -1.32, y: -0.6875, z: 0 }, 
+                        pos: { x: -1.32, y: 0.0625, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
                     // Item 5
                     { 
                         type: 'image', src: "https://placehold.co/600x800/2E8B57/white?text=5", 
                         width: 1.125, height: 1.5,
-                        pos: { x: 1.32, y: -0.6875, z: 0 }, 
+                        pos: { x: 1.32, y: 0.0625, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
                 ];
