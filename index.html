@@ -30,7 +30,7 @@
       font-size: 1.2rem;
       text-align: center;
       animation: fadeOut 2s forwards;
-      animation-delay: 5s;
+      animation-delay: 5s; /* صفحه لودینگ 5 ثانیه نمایش داده شود */
     }
 
     #loading-screen p {
@@ -62,7 +62,6 @@
   <!-- کتابخانه‌های واقعیت افزوده و Three.js -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.0/dist/mindar-image-aframe.prod.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
@@ -78,150 +77,95 @@
     منتظر بمانید تا عکس‌های جدید ظاهر شوند!
   </div>
 
-  <a-scene mindar-image="imageTargetSrc: targets.mind; filterMinCF: 0.0001; filterBeta: 100;"
+  <!--
+    صحنه واقعیت افزوده A-Frame
+    mindar-image: این کامپوننت هسته اصلی ردیابی تصویر است.
+      - imageTargetSrc: مسیر فایل ردیاب تصویر (که باید خودتون بسازید).
+  -->
+  <a-scene mindar-image="imageTargetSrc: targets.mind;"
            color-space="sRGB"
            renderer="colorManagement: true, physicallyCorrectLights: true"
            vr-mode-ui="enabled: false"
            device-orientation-permission-ui="enabled: false">
 
     <!-- دوربین AR -->
-    <a-camera mindar-image-camera></a-camera>
+    <a-camera mindar-image-camera=""></a-camera>
 
-    <!-- هدف ردیابی -->
-    <a-entity id="targetEntity" mindar-image-target="targetIndex: 0">
-      <a-entity id="photo-container"></a-entity>
-    </a-entity>
-  </a-scene>
-
-  <!-- کد جاوااسکریپت -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-
-        const scene = document.querySelector('a-scene');
-        const targetEntity = document.querySelector('#targetEntity');
-        const photoContainer = document.querySelector('#photo-container');
-
+    <!--
+      هدف ردیابی
+      اینجا جایی است که محتوای واقعیت افزوده ما قرار می‌گیرد.
+    -->
+    <a-entity mindar-image-target="targetIndex: 0">
+      <!--
+        کد JavaScript برای ایجاد و موقعیت‌دهی عکس‌های جدید
+        این بخش برای اضافه کردن قاب به عکس‌ها تغییر کرده است.
+      -->
+      <script>
+        const targetEntity = document.querySelector('a-entity[mindar-image-target]');
         const photos = [
-            "https://raw.githubusercontent.com/user/repo/main/photo1.jpg",
-            "https://raw.githubusercontent.com/user/repo/main/photo2.jpg",
-            "https://raw.githubusercontent.com/user/repo/main/photo3.jpg",
-            "https://raw.githubusercontent.com/user/repo/main/photo4.jpg",
-            "https://raw.githubusercontent.com/user/repo/main/photo5.jpg"
+          // لینک‌های عکس‌های جدید خود را از گیت‌هاب اینجا قرار دهید
+          "https://raw.githubusercontent.com/user/repo/main/photo1.jpg",
+          "https://raw.githubusercontent.com/user/repo/main/photo2.jpg",
+          "https://raw.githubusercontent.com/user/repo/main/photo3.jpg",
+          "https://raw.githubusercontent.com/user/repo/main/photo4.jpg",
+          "https://raw.githubusercontent.com/user/repo/main/photo5.jpg"
         ];
 
-        const photoConfigs = [
-            { x: -1.0, y: 0.5, z: 0.05, rot: -15, scale: {width: 0.5, height: 0.75}, delay: 0 },
-            { x: 0.0, y: 0.9, z: 0.05, rot: 10, scale: {width: 0.7, height: 0.5}, delay: 500 },
-            { x: 1.0, y: 0.8, z: 0.05, rot: -5, scale: {width: 0.7, height: 0.5}, delay: 1000 },
-            { x: -1.2, y: -0.8, z: 0.05, rot: 5, scale: {width: 0.7, height: 0.5}, delay: 1500 },
-            { x: 1.2, y: -0.6, z: 0.05, rot: 15, scale: {width: 0.5, height: 0.75}, delay: 2000 }
-        ];
+        // تابع برای ایجاد یک عکس و قاب آن در صحنه
+        function createPhotoWithFrame(src, x, y, z, rotation) {
+          // ایجاد یک موجودیت کلی برای عکس و قاب
+          const container = document.createElement('a-entity');
+          container.setAttribute('position', `${x} ${y} ${z}`);
+          container.setAttribute('rotation', `0 0 ${rotation}`);
+          container.setAttribute('class', 'animated-photo-container');
 
-        let lastPosition = new THREE.Vector3();
-        let lastRotation = new THREE.Quaternion();
-        const DAMPING_FACTOR = 0.9;
+          // ایجاد قاب عکس (یک Plane با رنگ ثابت)
+          const frame = document.createElement('a-plane');
+          frame.setAttribute('width', '0.7');
+          frame.setAttribute('height', '0.55');
+          frame.setAttribute('position', `0 0 0.01`); // کمی عقب‌تر از عکس قرار می‌گیرد
+          frame.setAttribute('material', 'color: #C0C0C0; transparent: true; opacity: 0;'); // رنگ نقره‌ای
+          frame.setAttribute('animation', `property: material.opacity; from: 0; to: 1; dur: 2000; easing: easeInSine`);
 
-        class ARPhoto {
-            constructor(src, config) {
-                this.src = src;
-                this.config = config;
-                this.container = null;
-                this.frame = null;
-                this.photo = null;
-                this.isVisible = false;
-            }
+          // ایجاد عکس
+          const photo = document.createElement('a-image');
+          photo.setAttribute('src', src);
+          photo.setAttribute('width', '0.6');
+          photo.setAttribute('height', '0.45');
+          photo.setAttribute('position', `0 0 0.02`); // کمی جلوتر از قاب قرار می‌گیرد
+          photo.setAttribute('material', 'shader: standard; metalness: 0.1; roughness: 0.8; transparent: true; opacity: 0;');
+          photo.setAttribute('animation', `property: material.opacity; from: 0; to: 1; dur: 3000; easing: easeInSine`);
 
-            createElements() {
-                this.container = document.createElement('a-entity');
-                this.container.setAttribute('class', 'ar-photo-entity');
-                this.container.setAttribute('position', `${this.config.x} ${this.config.y} 0.05`);
-                this.container.setAttribute('rotation', `0 0 ${this.config.rot}`);
-                this.container.setAttribute('visible', 'false');
+          // اضافه کردن عکس و قاب به موجودیت اصلی
+          container.appendChild(frame);
+          container.appendChild(photo);
 
-                // قاب
-                this.frame = document.createElement('a-plane');
-                this.frame.setAttribute('width', `${this.config.scale.width + 0.1}`);
-                this.frame.setAttribute('height', `${this.config.scale.height + 0.1}`);
-                this.frame.setAttribute('color', '#C0C0C0');
-                this.frame.setAttribute('opacity', '0');
-
-                const frameShadow = document.createElement('a-plane');
-                frameShadow.setAttribute('width', `${this.config.scale.width + 0.15}`);
-                frameShadow.setAttribute('height', `${this.config.scale.height + 0.15}`);
-                frameShadow.setAttribute('position', `0.02 -0.02 -0.01`);
-                frameShadow.setAttribute('color', '#000');
-                frameShadow.setAttribute('opacity', '0.2');
-                frameShadow.setAttribute('transparent', 'true');
-                this.container.appendChild(frameShadow);
-                this.container.appendChild(this.frame);
-
-                // عکس
-                this.photo = document.createElement('a-image');
-                this.photo.setAttribute('src', this.src);
-                this.photo.setAttribute('width', `${this.config.scale.width}`);
-                this.photo.setAttribute('height', `${this.config.scale.height}`);
-                this.photo.setAttribute('position', `0 0 0.02`);
-                this.photo.setAttribute('opacity', '0');
-
-                this.container.appendChild(this.photo);
-                photoContainer.appendChild(this.container);
-            }
-
-            show() {
-                if (!this.isVisible) {
-                    setTimeout(() => {
-                        this.container.setAttribute('visible', 'true');
-                        let opacity = 0;
-                        const interval = setInterval(() => {
-                            if (opacity >= 1) {
-                                clearInterval(interval);
-                            } else {
-                                opacity += 0.05;
-                                this.photo.setAttribute('opacity', opacity);
-                                this.frame.setAttribute('opacity', opacity);
-                            }
-                        }, 50);
-                    }, this.config.delay);
-                    this.isVisible = true;
-                }
-            }
-
-            hide() {
-                if (this.isVisible) {
-                    this.container.setAttribute('visible', 'false');
-                    this.isVisible = false;
-                }
-            }
+          // اضافه کردن موجودیت اصلی به صحنه
+          targetEntity.appendChild(container);
         }
 
-        const arPhotos = photoConfigs.map((config, index) => {
-            const photo = new ARPhoto(photos[index], config);
-            photo.createElements();
-            return photo;
+        // موقعیت‌دهی تصادفی و زیبا برای عکس‌ها
+        // این مقادیر رو میتونید تغییر بدید تا جایگاه عکس‌ها رو تنظیم کنید
+        const positions = [
+          { x: 1.0, y: 0.2, z: 0.05, rot: 15 },
+          { x: 0.8, y: -0.8, z: 0.05, rot: -10 },
+          { x: -1.2, y: 0.5, z: 0.05, rot: -5 },
+          { x: -0.5, y: -1.0, z: 0.05, rot: 20 },
+          { x: 1.5, y: -0.5, z: 0.05, rot: -25 }
+        ];
+
+        // هر عکس را با تأخیر مشخصی به صحنه اضافه می‌کنیم
+        photos.forEach((photoSrc, index) => {
+          setTimeout(() => {
+            const pos = positions[index];
+            createPhotoWithFrame(photoSrc, pos.x, pos.y, pos.z, pos.rot);
+          }, index * 500); // 500 میلی‌ثانیه تأخیر بین هر عکس
         });
+      </script>
 
-        targetEntity.addEventListener('targetfound', () => {
-            arPhotos.forEach(photo => photo.show());
-        });
+    </a-entity>
 
-        targetEntity.addEventListener('targetlost', () => {
-            arPhotos.forEach(photo => photo.hide());
-        });
-
-        scene.addEventListener('tick', () => {
-            if (targetEntity.object3D.visible) {
-                const newPosition = targetEntity.object3D.position.clone();
-                const newRotation = targetEntity.object3D.quaternion.clone();
-
-                lastPosition.lerp(newPosition, DAMPING_FACTOR);
-                lastRotation.slerp(newRotation, DAMPING_FACTOR);
-
-                targetEntity.object3D.position.copy(lastPosition);
-                targetEntity.object3D.quaternion.copy(lastRotation);
-            }
-        });
-    });
-  </script>
+  </a-scene>
 
 </body>
 </html>
