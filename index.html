@@ -185,17 +185,17 @@
                 show() {
                     if (!this.isVisible) {
                         setTimeout(() => {
-                          this.container.setAttribute('visible', 'true');
-                          let opacity = 0;
-                          const opacityInterval = setInterval(() => {
-                            if (opacity >= 1) {
-                              clearInterval(opacityInterval);
-                            } else {
-                              opacity += 0.05;
-                              this.photo.setAttribute('material', `opacity: ${opacity};`);
-                              this.frame.setAttribute('material', `opacity: ${opacity};`);
-                            }
-                          }, 50); // هر 50 میلی‌ثانیه اجرا شود
+                            this.container.setAttribute('visible', 'true');
+                            let opacity = 0;
+                            const opacityInterval = setInterval(() => {
+                                if (opacity >= 1) {
+                                    clearInterval(opacityInterval);
+                                } else {
+                                    opacity += 0.05;
+                                    this.photo.setAttribute('material', 'opacity', opacity);
+                                    this.frame.setAttribute('material', 'opacity', opacity);
+                                }
+                            }, 50); // هر 50 میلی‌ثانیه اجرا شود
                         }, this.config.delay);
                         this.isVisible = true;
                     }
