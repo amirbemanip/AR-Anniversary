@@ -30,6 +30,7 @@
       font-size: 1.2rem;
       text-align: center;
       animation: fadeOut 2s forwards;
+      animation-delay: 5s; /* صفحه لودینگ 5 ثانیه نمایش داده شود */
     }
 
     #loading-screen p {
@@ -106,8 +107,8 @@
 
             // لینک‌های عکس‌های جدید خود را از گیت‌هاب اینجا قرار دهید
             const photos = [
-                "https://raw.githubusercontent.com/amirbemanip/aks/main/2.jpg",
-                "https://raw.githubusercontent.com/amirbemanip/aks/main/2.jpg",
+                "https://raw.githubusercontent.com/user/repo/main/photo1.jpg",
+                "https://raw.githubusercontent.com/user/repo/main/photo2.jpg",
                 "https://raw.githubusercontent.com/user/repo/main/photo3.jpg",
                 "https://raw.githubusercontent.com/user/repo/main/photo4.jpg",
                 "https://raw.githubusercontent.com/user/repo/main/photo5.jpg"
@@ -157,13 +158,9 @@
                     this.frame = document.createElement('a-plane');
                     this.frame.setAttribute('width', `${this.config.scale.width + 0.1}`);
                     this.frame.setAttribute('height', `${this.config.scale.height + 0.1}`);
-                    this.frame.setAttribute('material', 'color: #C0C0C0; transparent: true; opacity: 0;');
-                    this.frame.setAttribute('animation__opacity', `property: material.opacity; from: 0; to: 1; dur: 2000; easing: easeInSine; startEvents: targetfound`);
+                    this.frame.setAttribute('material', 'color: #C0C0C0; shader: flat;');
                     
                     // افزودن سایه به قاب
-                    this.frame.setAttribute('material', 'shader: flat; color: #C0C0C0;');
-                    this.frame.setAttribute('geometry', `primitive: plane; width: ${this.config.scale.width + 0.1}; height: ${this.config.scale.height + 0.1};`);
-                    
                     const frameShadow = document.createElement('a-plane');
                     frameShadow.setAttribute('width', `${this.config.scale.width + 0.15}`);
                     frameShadow.setAttribute('height', `${this.config.scale.height + 0.15}`);
@@ -178,8 +175,7 @@
                     this.photo.setAttribute('width', `${this.config.scale.width}`);
                     this.photo.setAttribute('height', `${this.config.scale.height}`);
                     this.photo.setAttribute('position', `0 0 0.02`); // کمی جلوتر از قاب
-                    this.photo.setAttribute('material', 'shader: standard; metalness: 0.1; roughness: 0.8; transparent: true; opacity: 0;');
-                    this.photo.setAttribute('animation__opacity', `property: material.opacity; from: 0; to: 1; dur: 3000; easing: easeInSine; startEvents: targetfound`);
+                    this.photo.setAttribute('material', 'shader: standard; metalness: 0.1; roughness: 0.8;');
 
                     this.container.appendChild(this.photo);
                     photoContainer.appendChild(this.container);
@@ -188,9 +184,19 @@
                 // نمایش عکس با انیمیشن
                 show() {
                     if (!this.isVisible) {
-                        this.container.setAttribute('visible', 'true');
-                        this.photo.emit('targetfound');
-                        this.frame.emit('targetfound');
+                        setTimeout(() => {
+                          this.container.setAttribute('visible', 'true');
+                          let opacity = 0;
+                          const opacityInterval = setInterval(() => {
+                            if (opacity >= 1) {
+                              clearInterval(opacityInterval);
+                            } else {
+                              opacity += 0.05;
+                              this.photo.setAttribute('material', `opacity: ${opacity};`);
+                              this.frame.setAttribute('material', `opacity: ${opacity};`);
+                            }
+                          }, 50); // هر 50 میلی‌ثانیه اجرا شود
+                        }, this.config.delay);
                         this.isVisible = true;
                     }
                 }
@@ -214,14 +220,6 @@
             // رویداد وقتی هدف پیدا میشه
             targetEntity.addEventListener('targetfound', () => {
                 arPhotos.forEach(photo => photo.show());
-                // یک انیمیشن برای پایداری در طول ردیابی
-                if (!targetEntity.animation) {
-                     targetEntity.animation = {
-                        property: 'rotation',
-                        easing: 'linear',
-                        loop: false
-                    };
-                }
             });
 
             // رویداد وقتی هدف گم میشه
@@ -259,4 +257,3 @@
 
 </body>
 </html>
-
