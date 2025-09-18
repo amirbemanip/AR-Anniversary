@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <title>یادگاری ما - چیدمان سفارشی</title>
+    <title>یادگاری ما - چیدمان سفارشی (ابعاد بزرگتر)</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; background-color: #000; color: #fff; overflow: hidden; direction: rtl; }
-        #loading-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align: items: center; background-color: rgba(0, 0, 0, 0.9); z-index: 1000; font-size: 1.2rem; text-align: center; animation: fadeOut 2s forwards; animation-delay: 5s; }
+        #loading-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: rgba(0, 0, 0, 0.9); z-index: 1000; font-size: 1.2rem; text-align: center; animation: fadeOut 2s forwards; animation-delay: 5s; }
         #loading-screen p { background-color: rgba(255, 255, 255, 0.2); padding: 10px 20px; border-radius: 10px; backdrop-filter: blur(5px); }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
         .instruction-box { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: rgba(0, 0, 0, 0.7); padding: 15px; border-radius: 15px; color: #fff; text-align: center; font-size: 1rem; z-index: 999; backdrop-filter: blur(5px); }
@@ -20,42 +20,39 @@
             init: function() {
                 const targetEntity = this.el;
 
-                // ===============================================================
-                // بخش تنظیمات اصلی - اینجا را برای تغییر موقعیت ویرایش کنید
-                // ===============================================================
                 const mediaItems = [
-                    // آیتم 1: مربع کوچک در بالا وسط
+                    // آیتم 1: مربع کوچک در بالا وسط - ابعاد ثابت (0.6x0.6)
                     { 
                         type: 'image', src: "https://placehold.co/600x600/FFFFFF/black?text=1", 
                         width: 0.6, height: 0.6, 
                         pos: { x: 0, y: 1.2, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
-                    // آیتم 2: مستطیل افقی در بالا چپ
+                    // آیتم 2: مستطیل افقی در بالا چپ - 50% بزرگتر
                     { 
                         type: 'image', src: "https://placehold.co/800x600/6A5ACD/white?text=2", 
-                        width: 1.0, height: 0.75, 
+                        width: 1.0 * 1.5, height: 0.75 * 1.5, // 50% بزرگتر
                         pos: { x: -0.8, y: 0.5, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
-                    // آیتم 3: مستطیل افقی در بالا راست (ویدئو)
+                    // آیتم 3: مستطیل افقی در بالا راست (ویدئو) - 50% بزرگتر
                     { 
                         type: 'video', src: "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_stereo.mp4", 
-                        width: 1.0, height: 0.75, 
+                        width: 1.0 * 1.5, height: 0.75 * 1.5, // 50% بزرگتر
                         pos: { x: 0.8, y: 0.5, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
-                    // آیتم 4: مستطیل عمودی در پایین چپ
+                    // آیتم 4: مستطیل عمودی در پایین چپ - 50% بزرگتر
                     { 
                         type: 'image', src: "https://placehold.co/600x800/4682B4/white?text=4", 
-                        width: 0.75, height: 1.0, 
+                        width: 0.75 * 1.5, height: 1.0 * 1.5, // 50% بزرگتر
                         pos: { x: -1.1, y: -0.5, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
-                    // آیتم 5: مستطیل عمودی در پایین راست
+                    // آیتم 5: مستطیل عمودی در پایین راست - 50% بزرگتر
                     { 
                         type: 'image', src: "https://placehold.co/600x800/2E8B57/white?text=5", 
-                        width: 0.75, height: 1.0, 
+                        width: 0.75 * 1.5, height: 1.0 * 1.5, // 50% بزرگتر
                         pos: { x: 1.1, y: -0.5, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
@@ -69,7 +66,6 @@
 
                 function createFramedMedia(item, index) {
                     const container = document.createElement('a-entity');
-                    // استفاده مستقیم از مقادیر pos و rot از آبجکت
                     container.setAttribute('position', `${item.pos.x} ${item.pos.y} ${item.pos.z}`);
                     container.setAttribute('rotation', `${item.rot.x} ${item.rot.y} ${item.rot.z}`);
 
