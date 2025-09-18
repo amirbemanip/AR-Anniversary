@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <title>یادگاری ما - واقعیت افزوده</title>
+    <title>یادگاری ما - واقعیت افزوده (نسخه اصلاح شده)</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -20,9 +20,6 @@
             init: function() {
                 const targetEntity = this.el;
 
-                // ===============================================================
-                // بخش تنظیمات اصلی - اینجا را ویرایش کنید
-                // ===============================================================
                 const mediaItems = [
                     { type: 'image', src: "https://placehold.co/600x600/6A5ACD/white?text=Image+1", width: 0.8, height: 0.8 },
                     { type: 'image', src: "https://placehold.co/800x600/4682B4/white?text=Image+2", width: 1, height: 0.75 },
@@ -31,24 +28,20 @@
                     { type: 'image', src: "https://placehold.co/600x600/8FBC8F/white?text=Image+5", width: 0.8, height: 0.8 },
                 ];
 
-                // پارامترهای چیدمان قوسی
-                const radius = 1.8; // شعاع دایره‌ای که عناصر روی آن قرار می‌گیرند (بزرگتر = فاصله بیشتر)
-                const angleSpread = 140; // زاویه کلی قوس به درجه (مثلا 180 برای نیم‌دایره)
-                // ===============================================================
+                const radius = 1.8;
+                const angleSpread = 140; 
 
                 const numItems = mediaItems.length;
 
                 mediaItems.forEach((item, index) => {
-                    // محاسبه موقعیت هر آیتم روی قوس
                     const angleDeg = (index / (numItems - 1) - 0.5) * angleSpread;
                     const angleRad = angleDeg * (Math.PI / 180);
                     
                     const x = radius * Math.sin(angleRad);
-                    const y = radius * Math.cos(angleRad) * 0.5 + 0.5; // کمی بیضوی‌تر کردن قوس
+                    const y = radius * Math.cos(angleRad) * 0.5 + 0.5;
                     const z = 0.1;
-                    const rot = -angleDeg; // چرخش هر آیتم به سمت مرکز
+                    const rot = -angleDeg;
 
-                    // ایجاد آیتم با قاب و سایه
                     const container = createFramedMedia(item, {x, y, z, rot}, index);
                     targetEntity.appendChild(container);
                 });
@@ -60,23 +53,20 @@
 
                     const frameWidth = item.width * 1.1;
                     const frameHeight = item.height * 1.1;
-                    const animationDelay = 500 + index * 300; // تاخیر انیمیشن برای هر آیتم
+                    const animationDelay = 500 + index * 300;
 
-                    // 1. ایجاد سایه
                     const shadow = document.createElement('a-plane');
                     shadow.setAttribute('width', frameWidth);
                     shadow.setAttribute('height', frameHeight);
                     shadow.setAttribute('position', `0 0 -0.02`);
                     shadow.setAttribute('material', 'color: #000; transparent: true; opacity: 0.5;');
 
-                    // 2. ایجاد قاب سفید
                     const frame = document.createElement('a-plane');
                     frame.setAttribute('width', frameWidth);
                     frame.setAttribute('height', frameHeight);
                     frame.setAttribute('position', `0 0 -0.01`);
                     frame.setAttribute('material', 'color: white;');
                     
-                    // 3. ایجاد محتوای اصلی (عکس یا ویدئو)
                     let mediaElement;
                     if (item.type === 'image') {
                         mediaElement = document.createElement('a-image');
@@ -86,9 +76,8 @@
                         mediaElement.setAttribute('src', item.src);
                         mediaElement.setAttribute('loop', 'true');
                         mediaElement.setAttribute('autoplay', 'true');
-                        mediaElement.setAttribute('muted', 'true'); // برای پخش خودکار در موبایل ضروری است
+                        mediaElement.setAttribute('muted', 'true');
 
-                        // کنترل پخش ویدئو با پیدا شدن و گم شدن مارکر
                         targetEntity.addEventListener('targetFound', () => { mediaElement.play(); });
                         targetEntity.addEventListener('targetLost', () => { mediaElement.pause(); });
                     }
@@ -96,9 +85,7 @@
                     mediaElement.setAttribute('height', item.height);
                     mediaElement.setAttribute('position', `0 0 0`);
 
-                    // افزودن انیمیشن‌ها به کانتینر اصلی
                     container.setAttribute('animation__scale', `property: scale; from: 0 0 0; to: 1 1 1; dur: 1200; easing: easeInOutQuad; delay: ${animationDelay}`);
-                    container.setAttribute('animation__fade', `property: components.material.opacity; from: 0; to: 1; dur: 1500; easing: easeInOutQuad; delay: ${animationDelay}`);
                     
                     container.appendChild(shadow);
                     container.appendChild(frame);
@@ -128,7 +115,7 @@
              vr-mode-ui="enabled: false"
              device-orientation-permission-ui="enabled: false">
         
-        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+        <a-camera mindar-image-camera=""></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0" media-layout>
         </a-entity>
