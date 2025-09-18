@@ -1,15 +1,27 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
-    <title>یادگاری ما - نسخه نهایی</title>
+    <title>Our Memory - AR Experience (Final)</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; background-color: #000; color: #fff; overflow: hidden; direction: rtl; }
+        body { margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; background-color: #000; color: #fff; overflow: hidden; direction: ltr; }
         #loading-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: rgba(0, 0, 0, 0.9); z-index: 1000; font-size: 1.2rem; text-align: center; animation: fadeOut 2s forwards; animation-delay: 5s; }
         #loading-screen p { background-color: rgba(255, 255, 255, 0.2); padding: 10px 20px; border-radius: 10px; backdrop-filter: blur(5px); }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-        .instruction-box { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: rgba(0, 0, 0, 0.7); padding: 15px; border-radius: 15px; color: #fff; text-align: center; font-size: 1rem; z-index: 999; backdrop-filter: blur(5px); }
+        
+        .instruction-box { 
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            background-color: rgba(0, 0, 0, 0.7); padding: 15px; border-radius: 15px; 
+            color: #fff; text-align: center; font-size: 1rem; z-index: 999; 
+            backdrop-filter: blur(5px);
+            opacity: 1;
+            transition: opacity 2s ease-out;
+        }
+        .instruction-box.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.3/Vazirmatn-Variable-font-face.css">
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
@@ -20,47 +32,44 @@
             init: function() {
                 const targetEntity = this.el;
 
-                // ===============================================================
-                // آخرین تغییرات نهایی در موقعیت عمودی اعمال شد
-                // ===============================================================
+                // Positions reverted to the state before the 50% global increase
                 const mediaItems = [
-                    // آیتم 1
+                    // Item 1
                     { 
                         type: 'image', src: "https://placehold.co/600x600/FFFFFF/black?text=1", 
                         width: 0.6, height: 0.6, 
-                        pos: { x: 0, y: 2.7638, z: 0 }, 
+                        pos: { x: 0, y: 1.8425, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
-                    // آیتم 2
+                    // Item 2
                     { 
                         type: 'image', src: "https://placehold.co/800x600/6A5ACD/white?text=2", 
                         width: 1.5, height: 1.125,
-                        pos: { x: -0.88, y: 1.1859, z: 0 }, 
+                        pos: { x: -0.88, y: 0.7906, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
-                    // آیتم 3 (ویدئو)
+                    // Item 3 (Video)
                     { 
                         type: 'video', src: "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_stereo.mp4", 
                         width: 1.5, height: 1.125,
-                        pos: { x: 0.88, y: 1.1859, z: 0 }, 
+                        pos: { x: 0.88, y: 0.7906, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
-                    // آیتم 4
+                    // Item 4
                     { 
                         type: 'image', src: "https://placehold.co/600x800/4682B4/white?text=4", 
                         width: 1.125, height: 1.5,
-                        pos: { x: -1.32, y: -1.0313, z: 0 }, 
+                        pos: { x: -1.32, y: -0.6875, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
-                    // آیتم 5
+                    // Item 5
                     { 
                         type: 'image', src: "https://placehold.co/600x800/2E8B57/white?text=5", 
                         width: 1.125, height: 1.5,
-                        pos: { x: 1.32, y: -1.0313, z: 0 }, 
+                        pos: { x: 1.32, y: -0.6875, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
                 ];
-                // ===============================================================
 
                 mediaItems.forEach((item, index) => {
                     const container = createFramedMedia(item, index);
@@ -116,18 +125,27 @@
                 }
             }
         });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const instructionBox = document.querySelector('.instruction-box');
+            setTimeout(() => {
+                if (instructionBox) {
+                    instructionBox.classList.add('hide');
+                }
+            }, 6000); 
+        });
     </script>
 </head>
 <body>
 
     <div id="loading-screen">
-        <p>در حال آماده‌سازی تجربه واقعیت افزوده...</p>
-        <p>لطفاً مجوز دسترسی به دوربین را تایید کنید.</p>
+        <p>Preparing Augmented Reality experience...</p>
+        <p>Please allow camera access.</p>
     </div>
 
     <div class="instruction-box">
-        دوربین را به سمت قاب عکس سالگرد بگیرید.<br>
-        منتظر بمانید تا خاطرات ظاهر شوند!
+        Point your camera at the anniversary photo frame.<br>
+        Wait for new photos and videos to appear!
     </div>
 
     <a-scene mindar-image="imageTargetSrc: targets.mind;"
