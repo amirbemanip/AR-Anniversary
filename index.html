@@ -1,149 +1,171 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Our Memories | AR Experience</title>
+  <title>یادگاری ما - واقعیت افزوده</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- CSS برای ظاهر کلی صفحه -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Vazirmatn', sans-serif;
+      background-color: #000;
+      color: #fff;
+      overflow: hidden;
+      direction: rtl;
+    }
+    #loading-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      font-size: 1.2rem;
+      text-align: center;
+      animation: fadeOut 2s forwards;
+      animation-delay: 5s; /* صفحه لودینگ 5 ثانیه نمایش داده شود */
+    }
 
-    <!-- A-Frame and AR.js Libraries -->
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-
-    <style>
-        /* Basic Styles */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
-        :root { --primary-bg: #0a192f; --text-light: #ccd6f6; --accent: #64ffda; }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--primary-bg); color: var(--text-light); margin: 0; overflow: hidden; }
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; background-color: var(--primary-bg); z-index: 10; transition: opacity 0.5s; }
-        .overlay.hidden { opacity: 0; pointer-events: none; }
-        h1 { font-size: 2.8rem; color: white; }
-        p { font-size: 1.2rem; margin-bottom: 2.5rem; }
-        .button-container { display: flex; gap: 20px; }
-        .action-button { background: transparent; color: var(--accent); padding: 18px 30px; font-size: 1rem; font-weight: bold; cursor: pointer; border: 2px solid var(--accent); border-radius: 8px; }
-        #video-overlay { z-index: 1001; }
-        #anniversary-video { width: 95%; max-width: 900px; border-radius: 12px; }
-        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 45px; font-weight: bold; color: white; cursor: pointer; }
-        
-        #debug-text {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            z-index: 100;
-            font-size: 16px;
-            display: none;
-            transition: opacity 0.5s;
-        }
-    </style>
+    #loading-screen p {
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 10px 20px;
+        border-radius: 10px;
+        backdrop-filter: blur(5px);
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden; }
+    }
+    .instruction-box {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 15px;
+      border-radius: 15px;
+      color: #fff;
+      text-align: center;
+      font-size: 1rem;
+      z-index: 999;
+      backdrop-filter: blur(5px);
+    }
+  </style>
+  <!-- فونت فارسی -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.3/Vazirmatn-Variable-font-face.css">
+  <!-- کتابخانه‌های واقعیت افزوده و Three.js -->
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.0/dist/mindar-image-aframe.prod.js"></script>
 </head>
-
 <body>
-    <!-- UI Elements -->
-    <div id="start-container" class="overlay">
-        <h1>Happy Anniversary</h1>
-        <p>Choose an experience</p>
-        <div class="button-container">
-            <button id="watch-video-btn" class="action-button">🎬 Watch Video</button>
-            <button id="start-ar-btn" class="action-button">✨ Start AR Gallery</button>
-        </div>
-    </div>
-    <div id="video-overlay" class="overlay hidden">
-        <span id="close-video-btn" class="close-btn">&times;</span>
-        <video id="anniversary-video" controls><source src="YOUR_VIDEO_LINK.mp4" type="video/mp4"></video>
-    </div>
 
-    <div id="debug-text">Searching for marker...</div>
+  <!-- صفحه لودینگ اولیه -->
+  <div id="loading-screen">
+    <p>در حال آماده‌سازی تجربه واقعیت افزوده...</p>
+    <p>لطفاً مجوز دسترسی به دوربین را تایید کنید.</p>
+  </div>
 
-    <!-- AR Scene -->
-    <a-scene id="main-scene" embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
-        <a-assets>
-            <img id="empty-frame" src="https://i.imgur.com/aC3z2G5.png" crossorigin="anonymous">
-            <img id="real-photo-1" src="YOUR_PHOTO_1_LINK.jpg" crossorigin="anonymous">
-            <img id="real-photo-2" src="YOUR_PHOTO_2_LINK.jpg" crossorigin="anonymous">
-            <img id="real-photo-3" src="YOUR_PHOTO_3_LINK.jpg" crossorigin="anonymous">
-            <img id="real-photo-4" src="YOUR_PHOTO_4_LINK.jpg" crossorigin="anonymous">
-            <img id="real-photo-5" src="YOUR_PHOTO_5_LINK.jpg" crossorigin="anonymous">
-        </a-assets>
+  <!-- راهنمای کار با برنامه -->
+  <div class="instruction-box">
+    دوربین را به سمت قاب عکس سالگرد بگیرید.<br>
+    منتظر بمانید تا عکس‌های جدید ظاهر شوند!
+  </div>
 
-        <!-- The Marker is only a trigger -->
-        <a-marker id="main-marker" type='pattern' url='./marker/pattern-marker.patt'>
-            <!-- The gallery is inside the marker initially to get its starting position -->
-            <a-entity id="gallery-container" position="0 0.6 0" visible="false">
-                <!-- Frame 1 (Top Left) -->
-                <a-entity position="-1.0 0.6 0" rotation="-90 0 10">
-                    <a-plane material="src: #real-photo-1;" width="0.72" height="0.9" position="0 0 0.01"></a-plane>
-                    <a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="1.0"></a-plane>
-                </a-entity>
-                <!-- Other frames... -->
-                <a-entity position="0 0.8 0" rotation="-90 0 0"><a-plane material="src: #real-photo-2;" width="0.81" height="0.54" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.9" height="0.6"></a-plane></a-entity>
-                <a-entity position="1.0 0.7 0" rotation="-90 0 0"><a-plane material="src: #real-photo-3;" width="0.72" height="0.48" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="0.53"></a-plane></a-entity>
-                <a-entity position="-1.0 -0.4 0" rotation="-90 0 0"><a-plane material="src: #real-photo-4;" width="0.81" height="0.54" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.9" height="0.6"></a-plane></a-entity>
-                <a-entity position="1.0 -0.2 0" rotation="-90 0 -5"><a-plane material="src: #real-photo-5;" width="0.72" height="0.9" position="0 0 0.01"></a-plane><a-plane material="src: #empty-frame; transparent: true;" width="0.8" height="1.0"></a-plane></a-entity>
-            </a-entity>
-        </a-marker>
-        <a-entity camera></a-entity>
-    </a-scene>
+  <!--
+    صحنه واقعیت افزوده A-Frame
+    mindar-image: این کامپوننت هسته اصلی ردیابی تصویر است.
+      - imageTargetSrc: مسیر فایل ردیاب تصویر (که باید خودتون بسازید).
+  -->
+  <a-scene mindar-image="imageTargetSrc: my-target.mind;"
+           color-space="sRGB"
+           renderer="colorManagement: true, physicallyCorrectLights: true"
+           vr-mode-ui="enabled: false"
+           device-orientation-permission-ui="enabled: false">
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const startContainer = document.getElementById('start-container');
-            const videoOverlay = document.getElementById('video-overlay');
-            const videoPlayer = document.getElementById('anniversary-video');
-            const startArBtn = document.getElementById('start-ar-btn');
-            const watchVideoBtn = document.getElementById('watch-video-btn');
-            const closeVideoBtn = document.getElementById('close-video-btn');
-            const debugText = document.getElementById('debug-text');
-            const scene = document.querySelector('a-scene');
-            const marker = document.getElementById('main-marker');
-            const gallery = document.getElementById('gallery-container');
+    <!-- دوربین AR -->
+    <a-camera mindar-image-camera=""></a-camera>
 
-            let isAnchored = false;
+    <!--
+      هدف ردیابی
+      اینجا جایی است که محتوای واقعیت افزوده ما قرار می‌گیرد.
+    -->
+    <a-entity mindar-image-target="targetIndex: 0">
+      <!--
+        کد JavaScript برای ایجاد و موقعیت‌دهی عکس‌های جدید
+        این بخش برای اضافه کردن قاب به عکس‌ها تغییر کرده است.
+      -->
+      <script>
+        const targetEntity = document.querySelector('a-entity[mindar-image-target]');
+        const photos = [
+          // لینک‌های عکس‌های جدید خود را از گیت‌هاب اینجا قرار دهید
+          "https://raw.githubusercontent.com/user/repo/main/photo1.jpg",
+          "https://raw.githubusercontent.com/user/repo/main/photo2.jpg",
+          "https://raw.githubusercontent.com/user/repo/main/photo3.jpg",
+          "https://raw.githubusercontent.com/user/repo/main/photo4.jpg",
+          "https://raw.githubusercontent.com/user/repo/main/photo5.jpg"
+        ];
+        
+        // تابع برای ایجاد یک عکس و قاب آن در صحنه
+        function createPhotoWithFrame(src, x, y, z, rotation) {
+          // ایجاد یک موجودیت کلی برای عکس و قاب
+          const container = document.createElement('a-entity');
+          container.setAttribute('position', `${x} ${y} ${z}`);
+          container.setAttribute('rotation', `0 0 ${rotation}`);
+          container.setAttribute('class', 'animated-photo-container');
+          
+          // ایجاد قاب عکس (یک Plane با رنگ ثابت)
+          const frame = document.createElement('a-plane');
+          frame.setAttribute('width', '0.7');
+          frame.setAttribute('height', '0.55');
+          frame.setAttribute('position', `0 0 0.01`); // کمی عقب‌تر از عکس قرار می‌گیرد
+          frame.setAttribute('material', 'color: #c29416; transparent: true; opacity: 0;'); // رنگ طلایی
+          frame.setAttribute('animation', `property: material.opacity; from: 0; to: 1; dur: 1500; easing: easeInSine`);
+          
+          // ایجاد عکس
+          const photo = document.createElement('a-image');
+          photo.setAttribute('src', src);
+          photo.setAttribute('width', '0.6');
+          photo.setAttribute('height', '0.45');
+          photo.setAttribute('position', `0 0 0.02`); // کمی جلوتر از قاب قرار می‌گیرد
+          photo.setAttribute('material', 'shader: standard; metalness: 0.1; roughness: 0.8; transparent: true; opacity: 0;');
+          photo.setAttribute('animation', `property: material.opacity; from: 0; to: 1; dur: 2000; easing: easeInSine`);
+          
+          // اضافه کردن عکس و قاب به موجودیت اصلی
+          container.appendChild(frame);
+          container.appendChild(photo);
+          
+          // اضافه کردن موجودیت اصلی به صحنه
+          targetEntity.appendChild(container);
+        }
 
-            startArBtn.addEventListener('click', () => {
-                startContainer.classList.add('hidden');
-                debugText.style.display = 'block';
-            });
-            watchVideoBtn.addEventListener('click', () => { videoOverlay.classList.remove('hidden'); videoPlayer.play(); });
-            closeVideoBtn.addEventListener('click', () => { videoOverlay.classList.add('hidden'); videoPlayer.pause(); });
+        // موقعیت‌دهی تصادفی و زیبا برای عکس‌ها
+        // این مقادیر رو میتونید تغییر بدید تا جایگاه عکس‌ها رو تنظیم کنید
+        const positions = [
+          { x: 1.0, y: 0.2, z: 0.05, rot: 15 },
+          { x: 0.8, y: -0.8, z: 0.05, rot: -10 },
+          { x: -1.2, y: 0.5, z: 0.05, rot: -5 },
+          { x: -0.5, y: -1.0, z: 0.05, rot: 20 },
+          { x: 1.5, y: -0.5, z: 0.05, rot: -25 }
+        ];
 
-            marker.addEventListener('markerFound', () => {
-                if (isAnchored) return; // This runs only once
-                isAnchored = true;
-
-                // ✅ By waiting for the next browser frame, we ensure all matrix calculations are complete.
-                setTimeout(() => {
-                    // 1. Create temporary THREE.js objects to store the world transform
-                    const worldPosition = new THREE.Vector3();
-                    const worldQuaternion = new THREE.Quaternion();
-                    const worldScale = new THREE.Vector3();
-
-                    // 2. Get the gallery's absolute world position, rotation, and scale
-                    gallery.object3D.updateWorldMatrix(true, false);
-                    gallery.object3D.matrixWorld.decompose(worldPosition, worldQuaternion, worldScale);
-
-                    // 3. Immediately re-parent the gallery to the main scene.
-                    scene.object3D.add(gallery.object3D);
-
-                    // 4. Apply the captured world transforms back to the gallery's local transforms.
-                    gallery.object3D.position.copy(worldPosition);
-                    gallery.object3D.quaternion.copy(worldQuaternion);
-                    gallery.object3D.scale.copy(worldScale);
-                    
-                    // 5. Finally, make the anchored gallery visible.
-                    gallery.setAttribute('visible', 'true');
-
-                    // Update debug text
-                    debugText.textContent = "✅ Gallery Locked to Wall!";
-                    debugText.style.backgroundColor = '#2ecc71';
-                    setTimeout(() => { debugText.style.opacity = '0'; }, 2000);
-                }, 0); // A timeout of 0 waits for the next available frame
-            });
+        // هر عکس را با تأخیر مشخصی به صحنه اضافه می‌کنیم
+        photos.forEach((photoSrc, index) => {
+          setTimeout(() => {
+            const pos = positions[index];
+            createPhotoWithFrame(photoSrc, pos.x, pos.y, pos.z, pos.rot);
+          }, index * 500); // 500 میلی‌ثانیه تأخیر بین هر عکس
         });
-    </script>
+      </script>
+
+    </a-entity>
+
+  </a-scene>
+
 </body>
 </html>
-
