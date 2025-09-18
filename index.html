@@ -30,7 +30,7 @@
       font-size: 1.2rem;
       text-align: center;
       animation: fadeOut 2s forwards;
-      animation-delay: 5s; /* صفحه لودینگ 5 ثانیه نمایش داده شود */
+      animation-delay: 5s;
     }
 
     #loading-screen p {
@@ -81,8 +81,9 @@
     صحنه واقعیت افزوده A-Frame
     mindar-image: این کامپوننت هسته اصلی ردیابی تصویر است.
       - imageTargetSrc: مسیر فایل ردیاب تصویر (که باید خودتون بسازید).
+      - filterMinCF, filterBeta: این مقادیر برای کاهش لرزش و بهبود پایداری ردیابی بهینه شده‌اند.
   -->
-  <a-scene mindar-image="imageTargetSrc: targets.mind;"
+  <a-scene mindar-image="imageTargetSrc: my-target.mind; filterMinCF: 0.001; filterBeta: 10;"
            color-space="sRGB"
            renderer="colorManagement: true, physicallyCorrectLights: true"
            vr-mode-ui="enabled: false"
@@ -123,8 +124,8 @@
           const frame = document.createElement('a-plane');
           frame.setAttribute('width', '0.7');
           frame.setAttribute('height', '0.55');
-          frame.setAttribute('position', `0 0 0.01`); // کمی عقب‌تر از عکس قرار می‌گیرد
-          frame.setAttribute('material', 'color: #C0C0C0; transparent: true; opacity: 0;'); // رنگ نقره‌ای
+          frame.setAttribute('position', `0 0 0.01`);
+          frame.setAttribute('material', 'color: #C0C0C0; transparent: true; opacity: 0;');
           frame.setAttribute('animation', `property: material.opacity; from: 0; to: 1; dur: 2000; easing: easeInSine`);
           
           // ایجاد عکس
@@ -132,7 +133,7 @@
           photo.setAttribute('src', src);
           photo.setAttribute('width', '0.6');
           photo.setAttribute('height', '0.45');
-          photo.setAttribute('position', `0 0 0.02`); // کمی جلوتر از قاب قرار می‌گیرد
+          photo.setAttribute('position', `0 0 0.02`);
           photo.setAttribute('material', 'shader: standard; metalness: 0.1; roughness: 0.8; transparent: true; opacity: 0;');
           photo.setAttribute('animation', `property: material.opacity; from: 0; to: 1; dur: 3000; easing: easeInSine`);
           
@@ -159,7 +160,7 @@
           setTimeout(() => {
             const pos = positions[index];
             createPhotoWithFrame(photoSrc, pos.x, pos.y, pos.z, pos.rot);
-          }, index * 500); // 500 میلی‌ثانیه تأخیر بین هر عکس
+          }, index * 500);
         });
       </script>
 
@@ -169,4 +170,3 @@
 
 </body>
 </html>
-
