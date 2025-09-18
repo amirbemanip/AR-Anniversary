@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <title>یادگاری ما - چیدمان سفارشی (ابعاد بزرگتر)</title>
+    <title>یادگاری ما - چیدمان نهایی</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -20,40 +20,43 @@
             init: function() {
                 const targetEntity = this.el;
 
+                // ===============================================================
+                // مختصات جدید بر اساس درصد های درخواستی شما محاسبه شده است
+                // ===============================================================
                 const mediaItems = [
-                    // آیتم 1: مربع کوچک در بالا وسط - ابعاد ثابت (0.6x0.6)
+                    // آیتم 1
                     { 
                         type: 'image', src: "https://placehold.co/600x600/FFFFFF/black?text=1", 
                         width: 0.6, height: 0.6, 
-                        pos: { x: 0, y: 1.2, z: 0 }, 
+                        pos: { x: 0, y: 1.675, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
-                    // آیتم 2: مستطیل افقی در بالا چپ - 50% بزرگتر
+                    // آیتم 2
                     { 
                         type: 'image', src: "https://placehold.co/800x600/6A5ACD/white?text=2", 
-                        width: 1.0 * 1.5, height: 0.75 * 1.5, // 50% بزرگتر
-                        pos: { x: -0.8, y: 0.5, z: 0 }, 
+                        width: 1.5, height: 1.125,
+                        pos: { x: -0.88, y: 0.625, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
-                    // آیتم 3: مستطیل افقی در بالا راست (ویدئو) - 50% بزرگتر
+                    // آیتم 3 (ویدئو)
                     { 
                         type: 'video', src: "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_stereo.mp4", 
-                        width: 1.0 * 1.5, height: 0.75 * 1.5, // 50% بزرگتر
-                        pos: { x: 0.8, y: 0.5, z: 0 }, 
+                        width: 1.5, height: 1.125,
+                        pos: { x: 0.88, y: 0.625, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
-                    // آیتم 4: مستطیل عمودی در پایین چپ - 50% بزرگتر
+                    // آیتم 4
                     { 
                         type: 'image', src: "https://placehold.co/600x800/4682B4/white?text=4", 
-                        width: 0.75 * 1.5, height: 1.0 * 1.5, // 50% بزرگتر
-                        pos: { x: -1.1, y: -0.5, z: 0 }, 
+                        width: 1.125, height: 1.5,
+                        pos: { x: -1.32, y: -0.625, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
-                    // آیتم 5: مستطیل عمودی در پایین راست - 50% بزرگتر
+                    // آیتم 5
                     { 
                         type: 'image', src: "https://placehold.co/600x800/2E8B57/white?text=5", 
-                        width: 0.75 * 1.5, height: 1.0 * 1.5, // 50% بزرگتر
-                        pos: { x: 1.1, y: -0.5, z: 0 }, 
+                        width: 1.125, height: 1.5,
+                        pos: { x: 1.32, y: -0.625, z: 0 }, 
                         rot: { x: 0, y: 0, z: 0 } 
                     },
                 ];
