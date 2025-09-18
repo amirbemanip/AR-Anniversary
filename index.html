@@ -115,12 +115,18 @@
             ];
 
             // پیکربندی موقعیت‌های عکس‌ها با دقت بیشتر
+            // این تنظیمات بر اساس طرح ارسالی شما بازنویسی شده‌اند
             const photoConfigs = [
-                { x: 1.0, y: 0.2, rot: 15, delay: 0 },
-                { x: 0.8, y: -0.8, rot: -10, delay: 500 },
-                { x: -1.2, y: 0.5, rot: -5, delay: 1000 },
-                { x: -0.5, y: -1.0, rot: 20, delay: 1500 },
-                { x: 1.5, y: -0.5, rot: -25, delay: 2000 }
+                // عکس ۱ (بالا و چپ - عمودی)
+                { x: -1.0, y: 0.5, z: 0.05, rot: -15, scale: {width: 0.5, height: 0.75}, delay: 0 },
+                // عکس ۲ (بالا و وسط - افقی)
+                { x: 0.0, y: 0.9, z: 0.05, rot: 10, scale: {width: 0.7, height: 0.5}, delay: 500 },
+                // عکس ۳ (بالا و راست - افقی)
+                { x: 1.0, y: 0.8, z: 0.05, rot: -5, scale: {width: 0.7, height: 0.5}, delay: 1000 },
+                // عکس ۴ (پایین و چپ - افقی)
+                { x: -1.2, y: -0.8, z: 0.05, rot: 5, scale: {width: 0.7, height: 0.5}, delay: 1500 },
+                // عکس ۵ (پایین و راست - عمودی)
+                { x: 1.2, y: -0.6, z: 0.05, rot: 15, scale: {width: 0.5, height: 0.75}, delay: 2000 }
             ];
 
             // متغیرها برای پایدارسازی
@@ -150,18 +156,18 @@
 
                     // ایجاد قاب عکس (با سایه)
                     this.frame = document.createElement('a-plane');
-                    this.frame.setAttribute('width', '0.7');
-                    this.frame.setAttribute('height', '0.55');
+                    this.frame.setAttribute('width', `${this.config.scale.width + 0.1}`);
+                    this.frame.setAttribute('height', `${this.config.scale.height + 0.1}`);
                     this.frame.setAttribute('material', 'color: #C0C0C0; transparent: true; opacity: 0;');
                     this.frame.setAttribute('animation__opacity', `property: material.opacity; from: 0; to: 1; dur: 2000; easing: easeInSine; pauseEvents: targetfound, targetlost`);
                     
                     // افزودن سایه به قاب
                     this.frame.setAttribute('material', 'shader: flat; color: #C0C0C0;');
-                    this.frame.setAttribute('geometry', 'primitive: plane; width: 0.7; height: 0.55;');
+                    this.frame.setAttribute('geometry', `primitive: plane; width: ${this.config.scale.width + 0.1}; height: ${this.config.scale.height + 0.1};`);
                     
                     const frameShadow = document.createElement('a-plane');
-                    frameShadow.setAttribute('width', '0.75');
-                    frameShadow.setAttribute('height', '0.6');
+                    frameShadow.setAttribute('width', `${this.config.scale.width + 0.15}`);
+                    frameShadow.setAttribute('height', `${this.config.scale.height + 0.15}`);
                     frameShadow.setAttribute('position', `0.02 -0.02 -0.01`);
                     frameShadow.setAttribute('material', 'color: #000; transparent: true; opacity: 0.2;');
                     this.container.appendChild(frameShadow);
@@ -170,8 +176,8 @@
                     // ایجاد عکس
                     this.photo = document.createElement('a-image');
                     this.photo.setAttribute('src', this.src);
-                    this.photo.setAttribute('width', '0.6');
-                    this.photo.setAttribute('height', '0.45');
+                    this.photo.setAttribute('width', `${this.config.scale.width}`);
+                    this.photo.setAttribute('height', `${this.config.scale.height}`);
                     this.photo.setAttribute('position', `0 0 0.02`); // کمی جلوتر از قاب
                     this.photo.setAttribute('material', 'shader: standard; metalness: 0.1; roughness: 0.8; transparent: true; opacity: 0;');
                     this.photo.setAttribute('animation__opacity', `property: material.opacity; from: 0; to: 1; dur: 3000; easing: easeInSine; pauseEvents: targetfound, targetlost`);
@@ -254,4 +260,3 @@
 
 </body>
 </html>
-
