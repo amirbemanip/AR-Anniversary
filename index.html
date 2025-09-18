@@ -4,7 +4,6 @@
   <title>یادگاری ما - واقعیت افزوده</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- CSS برای ظاهر کلی صفحه -->
   <style>
     body {
       margin: 0;
@@ -25,7 +24,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background-color: rgba(0, 0, 0, 0.9);
+      background-color: rgba(0,0,0,0.9);
       z-index: 1000;
       font-size: 1.2rem;
       text-align: center;
@@ -33,7 +32,7 @@
       animation-delay: 5s;
     }
     #loading-screen p {
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: rgba(255,255,255,0.2);
       padding: 10px 20px;
       border-radius: 10px;
       backdrop-filter: blur(5px);
@@ -46,7 +45,7 @@
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background-color: rgba(0, 0, 0, 0.7);
+      background-color: rgba(0,0,0,0.7);
       padding: 15px;
       border-radius: 15px;
       color: #fff;
@@ -56,108 +55,101 @@
       backdrop-filter: blur(5px);
     }
   </style>
-  <!-- فونت فارسی -->
+
+  <!-- فونت -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.3/Vazirmatn-Variable-font-face.css">
-  <!-- کتابخانه‌های واقعیت افزوده -->
+
+  <!-- کتابخانه‌ها -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.0/dist/mindar-image-aframe.prod.js"></script>
 </head>
 <body>
 
-  <!-- صفحه لودینگ -->
   <div id="loading-screen">
     <p>در حال آماده‌سازی تجربه واقعیت افزوده...</p>
     <p>لطفاً مجوز دسترسی به دوربین را تایید کنید.</p>
   </div>
 
-  <!-- راهنمای کار -->
   <div class="instruction-box">
     دوربین را به سمت قاب عکس سالگرد بگیرید.<br>
     منتظر بمانید تا عکس‌های جدید ظاهر شوند!
   </div>
 
-  <!-- صحنه AR -->
   <a-scene mindar-image="imageTargetSrc: targets.mind;"
            color-space="sRGB"
            renderer="colorManagement: true, physicallyCorrectLights: true"
            vr-mode-ui="enabled: false"
            device-orientation-permission-ui="enabled: false">
-
     <a-camera mindar-image-camera></a-camera>
     <a-entity id="target" mindar-image-target="targetIndex: 0"></a-entity>
   </a-scene>
 
   <script>
-    const targetEntity = document.querySelector('#target');
+    document.addEventListener("DOMContentLoaded", () => {
+      const targetEntity = document.querySelector('#target');
 
-    // لینک عکس‌ها (لینک مستقیم لازم است)
-    const photos = [
-      "https://raw.githubusercontent.com/user/repo/main/photo1.jpg",
-      "https://raw.githubusercontent.com/user/repo/main/photo2.jpg",
-      "https://raw.githubusercontent.com/user/repo/main/photo3.jpg",
-      "https://raw.githubusercontent.com/user/repo/main/photo4.jpg",
-      "https://raw.githubusercontent.com/user/repo/main/photo5.jpg"
-    ];
+      const photos = [
+        "https://raw.githubusercontent.com/user/repo/main/photo1.jpg",
+        "https://raw.githubusercontent.com/user/repo/main/photo2.jpg",
+        "https://raw.githubusercontent.com/user/repo/main/photo3.jpg",
+        "https://raw.githubusercontent.com/user/repo/main/photo4.jpg",
+        "https://raw.githubusercontent.com/user/repo/main/photo5.jpg"
+      ];
 
-    // تابع ساخت قاب + عکس
-    function createPhotoWithFrame(src, w, h, x, y, z) {
-      const container = document.createElement('a-entity');
-      container.setAttribute('position', `${x} ${y} ${z}`);
-      container.setAttribute('rotation', `0 0 0`);
+      function createPhotoWithFrame(src, w, h, x, y, z) {
+        const container = document.createElement('a-entity');
+        container.setAttribute('position', `${x} ${y} ${z}`);
+        container.setAttribute('rotation', '0 0 0');
 
-      // قاب نقره‌ای
-      const frame = document.createElement('a-plane');
-      frame.setAttribute('width', `${w + 0.1}`);
-      frame.setAttribute('height', `${h + 0.1}`);
-      frame.setAttribute('color', '#C0C0C0');
-      frame.setAttribute('opacity', '0');
-      frame.setAttribute('material', 'shader: flat;');
-      frame.setAttribute('animation', 'property: opacity; from: 0; to: 1; dur: 1500; easing: easeOutQuad');
+        // قاب
+        const frame = document.createElement('a-plane');
+        frame.setAttribute('width', `${w + 0.1}`);
+        frame.setAttribute('height', `${h + 0.1}`);
+        frame.setAttribute('color', '#C0C0C0');
+        frame.setAttribute('opacity', '0');
+        frame.setAttribute('animation', 'property: opacity; from:0; to:1; dur:1500; easing:easeOutQuad');
 
-      // سایه قاب
-      const shadow = document.createElement('a-plane');
-      shadow.setAttribute('width', `${w + 0.2}`);
-      shadow.setAttribute('height', `${h + 0.2}`);
-      shadow.setAttribute('position', '0 -0.02 -0.01');
-      shadow.setAttribute('color', '#000');
-      shadow.setAttribute('opacity', '0.25');
+        // سایه
+        const shadow = document.createElement('a-plane');
+        shadow.setAttribute('width', `${w + 0.2}`);
+        shadow.setAttribute('height', `${h + 0.2}`);
+        shadow.setAttribute('position', '0 -0.02 -0.01');
+        shadow.setAttribute('color', '#000');
+        shadow.setAttribute('opacity', '0.25');
 
-      // عکس داخل قاب
-      const photo = document.createElement('a-image');
-      photo.setAttribute('src', src);
-      photo.setAttribute('width', `${w}`);
-      photo.setAttribute('height', `${h}`);
-      photo.setAttribute('position', `0 0 0.01`);
-      photo.setAttribute('opacity', '0');
-      photo.setAttribute('animation', 'property: opacity; from: 0; to: 1; dur: 2000; easing: easeOutQuad');
+        // عکس
+        const photo = document.createElement('a-image');
+        photo.setAttribute('src', src);
+        photo.setAttribute('width', `${w}`);
+        photo.setAttribute('height', `${h}`);
+        photo.setAttribute('position', '0 0 0.01');
+        photo.setAttribute('opacity', '0');
+        photo.setAttribute('animation', 'property: opacity; from:0; to:1; dur:2000; easing:easeOutQuad');
 
-      container.appendChild(shadow);
-      container.appendChild(frame);
-      container.appendChild(photo);
-      targetEntity.appendChild(container);
-    }
+        container.appendChild(shadow);
+        container.appendChild(frame);
+        container.appendChild(photo);
+        targetEntity.appendChild(container);
+      }
 
-    // اندازه پایه
-    const baseW = 0.6;
-    const baseH = 0.45;
+      const baseW = 0.6;
+      const baseH = 0.45;
 
-    // موقعیت قاب‌ها
-    const positions = [
-      { w: baseW, h: baseH,       x: 0,    y: 0,     z: 0.01 }, // وسط
-      { w: baseW, h: baseH*2,     x: -0.9, y: 0.7,   z: 0.01 }, // بالا چپ (۲ برابر)
-      { w: baseW, h: baseH*2.5,   x: -0.9, y: -0.9,  z: 0.01 }, // پایین چپ (۲.۵ برابر)
-      { w: baseW, h: baseH*2,     x: 0.9,  y: 0.7,   z: 0.01 }, // بالا راست (۲ برابر)
-      { w: baseW, h: baseH*2.5,   x: 0.9,  y: -0.9,  z: 0.01 }, // پایین راست (۲.۵ برابر)
-    ];
+      const positions = [
+        { w: baseW, h: baseH,     x: 0,    y: 0,    z: 0.01 },   // وسط
+        { w: baseW, h: baseH*2,   x: -0.9, y: 0.7,  z: 0.01 },   // بالا چپ
+        { w: baseW, h: baseH*2.5, x: -0.9, y: -0.9, z: 0.01 },   // پایین چپ
+        { w: baseW, h: baseH*2,   x: 0.9,  y: 0.7,  z: 0.01 },   // بالا راست
+        { w: baseW, h: baseH*2.5, x: 0.9,  y: -0.9, z: 0.01 }    // پایین راست
+      ];
 
-    // اضافه کردن عکس‌ها با تاخیر
-    photos.forEach((photoSrc, i) => {
-      setTimeout(() => {
-        const pos = positions[i];
-        createPhotoWithFrame(photoSrc, pos.w, pos.h, pos.x, pos.y, pos.z);
-      }, i * 500);
+      photos.forEach((photoSrc, i) => {
+        setTimeout(() => {
+          const pos = positions[i];
+          createPhotoWithFrame(photoSrc, pos.w, pos.h, pos.x, pos.y, pos.z);
+        }, i * 500);
+      });
     });
   </script>
-
 </body>
 </html>
