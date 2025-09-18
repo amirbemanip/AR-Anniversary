@@ -85,175 +85,138 @@
            device-orientation-permission-ui="enabled: false">
 
     <!-- دوربین AR -->
-    <a-camera mindar-image-camera=""></a-camera>
+    <a-camera mindar-image-camera></a-camera>
 
-    <!--
-      هدف ردیابی - تمام محتوای AR درون این تگ قرار می‌گیرد
-    -->
+    <!-- هدف ردیابی -->
     <a-entity id="targetEntity" mindar-image-target="targetIndex: 0">
       <a-entity id="photo-container"></a-entity>
     </a-entity>
+  </a-scene>
 
-    <!--
-      کد JavaScript پیشرفته برای ایجاد، موقعیت‌دهی و پایدارسازی عکس‌ها
-      این بخش کلیدی برای ایجاد یک تجربه حرفه‌ای است.
-    -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+  <!-- کد جاوااسکریپت -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
 
-            const scene = document.querySelector('a-scene');
-            const targetEntity = document.querySelector('#targetEntity');
-            const photoContainer = document.querySelector('#photo-container');
+        const scene = document.querySelector('a-scene');
+        const targetEntity = document.querySelector('#targetEntity');
+        const photoContainer = document.querySelector('#photo-container');
 
-            // لینک‌های عکس‌های جدید خود را از گیت‌هاب اینجا قرار دهید
-            const photos = [
-                "https://raw.githubusercontent.com/user/repo/main/photo1.jpg",
-                "https://raw.githubusercontent.com/user/repo/main/photo2.jpg",
-                "https://raw.githubusercontent.com/user/repo/main/photo3.jpg",
-                "https://raw.githubusercontent.com/user/repo/main/photo4.jpg",
-                "https://raw.githubusercontent.com/user/repo/main/photo5.jpg"
-            ];
+        const photos = [
+            "https://raw.githubusercontent.com/user/repo/main/photo1.jpg",
+            "https://raw.githubusercontent.com/user/repo/main/photo2.jpg",
+            "https://raw.githubusercontent.com/user/repo/main/photo3.jpg",
+            "https://raw.githubusercontent.com/user/repo/main/photo4.jpg",
+            "https://raw.githubusercontent.com/user/repo/main/photo5.jpg"
+        ];
 
-            // پیکربندی موقعیت‌های عکس‌ها با دقت بیشتر
-            // این تنظیمات بر اساس طرح ارسالی شما بازنویسی شده‌اند
-            const photoConfigs = [
-                // عکس ۱ (بالا و چپ - عمودی)
-                { x: -1.0, y: 0.5, z: 0.05, rot: -15, scale: {width: 0.5, height: 0.75}, delay: 0 },
-                // عکس ۲ (بالا و وسط - افقی)
-                { x: 0.0, y: 0.9, z: 0.05, rot: 10, scale: {width: 0.7, height: 0.5}, delay: 500 },
-                // عکس ۳ (بالا و راست - افقی)
-                { x: 1.0, y: 0.8, z: 0.05, rot: -5, scale: {width: 0.7, height: 0.5}, delay: 1000 },
-                // عکس ۴ (پایین و چپ - افقی)
-                { x: -1.2, y: -0.8, z: 0.05, rot: 5, scale: {width: 0.7, height: 0.5}, delay: 1500 },
-                // عکس ۵ (پایین و راست - عمودی)
-                { x: 1.2, y: -0.6, z: 0.05, rot: 15, scale: {width: 0.5, height: 0.75}, delay: 2000 }
-            ];
+        const photoConfigs = [
+            { x: -1.0, y: 0.5, z: 0.05, rot: -15, scale: {width: 0.5, height: 0.75}, delay: 0 },
+            { x: 0.0, y: 0.9, z: 0.05, rot: 10, scale: {width: 0.7, height: 0.5}, delay: 500 },
+            { x: 1.0, y: 0.8, z: 0.05, rot: -5, scale: {width: 0.7, height: 0.5}, delay: 1000 },
+            { x: -1.2, y: -0.8, z: 0.05, rot: 5, scale: {width: 0.7, height: 0.5}, delay: 1500 },
+            { x: 1.2, y: -0.6, z: 0.05, rot: 15, scale: {width: 0.5, height: 0.75}, delay: 2000 }
+        ];
 
-            // متغیرها برای پایدارسازی
-            let lastPosition = new THREE.Vector3();
-            let lastRotation = new THREE.Quaternion();
-            const DAMPING_FACTOR = 0.9; // مقدار کمتر = نرمی بیشتر
+        let lastPosition = new THREE.Vector3();
+        let lastRotation = new THREE.Quaternion();
+        const DAMPING_FACTOR = 0.9;
 
-            // کلاس اصلی برای مدیریت هر عکس
-            class ARPhoto {
-                constructor(src, config) {
-                    this.src = src;
-                    this.config = config;
-                    this.container = null;
-                    this.frame = null;
-                    this.photo = null;
-                    this.isVisible = false;
-                }
+        class ARPhoto {
+            constructor(src, config) {
+                this.src = src;
+                this.config = config;
+                this.container = null;
+                this.frame = null;
+                this.photo = null;
+                this.isVisible = false;
+            }
 
-                // ایجاد عناصر A-Frame
-                createElements() {
-                    // موجودیت کلی برای عکس و قاب
-                    this.container = document.createElement('a-entity');
-                    this.container.setAttribute('class', 'ar-photo-entity');
-                    this.container.setAttribute('position', `${this.config.x} ${this.config.y} 0.05`);
-                    this.container.setAttribute('rotation', `0 0 ${this.config.rot}`);
-                    this.container.setAttribute('visible', 'false'); // در ابتدا پنهان
+            createElements() {
+                this.container = document.createElement('a-entity');
+                this.container.setAttribute('class', 'ar-photo-entity');
+                this.container.setAttribute('position', `${this.config.x} ${this.config.y} 0.05`);
+                this.container.setAttribute('rotation', `0 0 ${this.config.rot}`);
+                this.container.setAttribute('visible', 'false');
 
-                    // ایجاد قاب عکس (با سایه)
-                    this.frame = document.createElement('a-plane');
-                    this.frame.setAttribute('width', `${this.config.scale.width + 0.1}`);
-                    this.frame.setAttribute('height', `${this.config.scale.height + 0.1}`);
-                    this.frame.setAttribute('material', 'color: #C0C0C0; shader: flat;');
-                    
-                    // افزودن سایه به قاب
-                    const frameShadow = document.createElement('a-plane');
-                    frameShadow.setAttribute('width', `${this.config.scale.width + 0.15}`);
-                    frameShadow.setAttribute('height', `${this.config.scale.height + 0.15}`);
-                    frameShadow.setAttribute('position', `0.02 -0.02 -0.01`);
-                    frameShadow.setAttribute('material', 'color: #000; transparent: true; opacity: 0.2;');
-                    this.container.appendChild(frameShadow);
-                    this.container.appendChild(this.frame);
+                this.frame = document.createElement('a-plane');
+                this.frame.setAttribute('width', `${this.config.scale.width + 0.1}`);
+                this.frame.setAttribute('height', `${this.config.scale.height + 0.1}`);
+                this.frame.setAttribute('material', 'color: #C0C0C0; shader: flat; opacity: 0;');
 
-                    // ایجاد عکس
-                    this.photo = document.createElement('a-image');
-                    this.photo.setAttribute('src', this.src);
-                    this.photo.setAttribute('width', `${this.config.scale.width}`);
-                    this.photo.setAttribute('height', `${this.config.scale.height}`);
-                    this.photo.setAttribute('position', `0 0 0.02`); // کمی جلوتر از قاب
-                    this.photo.setAttribute('material', 'shader: standard; metalness: 0.1; roughness: 0.8;');
+                const frameShadow = document.createElement('a-plane');
+                frameShadow.setAttribute('width', `${this.config.scale.width + 0.15}`);
+                frameShadow.setAttribute('height', `${this.config.scale.height + 0.15}`);
+                frameShadow.setAttribute('position', `0.02 -0.02 -0.01`);
+                frameShadow.setAttribute('material', 'color: #000; transparent: true; opacity: 0.2;');
+                this.container.appendChild(frameShadow);
+                this.container.appendChild(this.frame);
 
-                    this.container.appendChild(this.photo);
-                    photoContainer.appendChild(this.container);
-                }
+                this.photo = document.createElement('a-image');
+                this.photo.setAttribute('src', this.src);
+                this.photo.setAttribute('width', `${this.config.scale.width}`);
+                this.photo.setAttribute('height', `${this.config.scale.height}`);
+                this.photo.setAttribute('position', `0 0 0.02`);
+                this.photo.setAttribute('material', 'shader: standard; metalness: 0.1; roughness: 0.8; opacity: 0;');
 
-                // نمایش عکس با انیمیشن
-                show() {
-                    if (!this.isVisible) {
-                        setTimeout(() => {
-                            this.container.setAttribute('visible', 'true');
-                            let opacity = 0;
-                            const opacityInterval = setInterval(() => {
-                                if (opacity >= 1) {
-                                    clearInterval(opacityInterval);
-                                } else {
-                                    opacity += 0.05;
-                                    this.photo.setAttribute('material', 'opacity', opacity);
-                                    this.frame.setAttribute('material', 'opacity', opacity);
-                                }
-                            }, 50); // هر 50 میلی‌ثانیه اجرا شود
-                        }, this.config.delay);
-                        this.isVisible = true;
-                    }
-                }
+                this.container.appendChild(this.photo);
+                photoContainer.appendChild(this.container);
+            }
 
-                // پنهان کردن عکس
-                hide() {
-                    if (this.isVisible) {
-                        this.container.setAttribute('visible', 'false');
-                        this.isVisible = false;
-                    }
+            show() {
+                if (!this.isVisible) {
+                    setTimeout(() => {
+                        this.container.setAttribute('visible', 'true');
+                        let opacity = 0;
+                        const interval = setInterval(() => {
+                            if (opacity >= 1) {
+                                clearInterval(interval);
+                            } else {
+                                opacity += 0.05;
+                                this.photo.setAttribute('material', 'opacity', opacity);
+                                this.frame.setAttribute('material', 'opacity', opacity);
+                            }
+                        }, 50);
+                    }, this.config.delay);
+                    this.isVisible = true;
                 }
             }
 
-            // ایجاد آبجکت‌های عکس
-            const arPhotos = photoConfigs.map((config, index) => {
-                const photo = new ARPhoto(photos[index], config);
-                photo.createElements();
-                return photo;
-            });
-
-            // رویداد وقتی هدف پیدا میشه
-            targetEntity.addEventListener('targetfound', () => {
-                arPhotos.forEach(photo => photo.show());
-            });
-
-            // رویداد وقتی هدف گم میشه
-            targetEntity.addEventListener('targetlost', () => {
-                arPhotos.forEach(photo => photo.hide());
-            });
-
-            // رویداد فریم به فریم برای پایدارسازی موقعیت
-            scene.addEventListener('tick', (evt) => {
-                const marker = targetEntity.components['mindar-image-target'];
-                if (marker && marker.isDetected) {
-                    const matrixWorld = new THREE.Matrix4();
-                    marker.data.marker.matrix.toMatrix4(matrixWorld);
-                    
-                    const newPosition = new THREE.Vector3();
-                    const newRotation = new THREE.Quaternion();
-                    const scale = new THREE.Vector3();
-                    matrixWorld.decompose(newPosition, newRotation, scale);
-                    
-                    // پیاده‌سازی فیلتر نرم‌کننده (Smoothing Filter)
-                    // این بخش برای حذف لرزش حیاتی است
-                    lastPosition.lerp(newPosition, DAMPING_FACTOR);
-                    lastRotation.slerp(newRotation, DAMPING_FACTOR);
-                    
-                    // به روزرسانی موقعیت و چرخش برای عناصر
-                    targetEntity.object3D.position.copy(lastPosition);
-                    targetEntity.object3D.quaternion.copy(lastRotation);
-                    
+            hide() {
+                if (this.isVisible) {
+                    this.container.setAttribute('visible', 'false');
+                    this.isVisible = false;
                 }
-            });
+            }
+        }
 
+        const arPhotos = photoConfigs.map((config, index) => {
+            const photo = new ARPhoto(photos[index], config);
+            photo.createElements();
+            return photo;
         });
-    </script>
-  </a-scene>
+
+        targetEntity.addEventListener('targetfound', () => {
+            arPhotos.forEach(photo => photo.show());
+        });
+
+        targetEntity.addEventListener('targetlost', () => {
+            arPhotos.forEach(photo => photo.hide());
+        });
+
+        scene.addEventListener('tick', () => {
+            if (targetEntity.object3D.visible) {
+                const newPosition = targetEntity.object3D.position.clone();
+                const newRotation = targetEntity.object3D.quaternion.clone();
+
+                lastPosition.lerp(newPosition, DAMPING_FACTOR);
+                lastRotation.slerp(newRotation, DAMPING_FACTOR);
+
+                targetEntity.object3D.position.copy(lastPosition);
+                targetEntity.object3D.quaternion.copy(lastRotation);
+            }
+        });
+    });
+  </script>
 
 </body>
 </html>
