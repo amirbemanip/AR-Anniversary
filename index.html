@@ -89,28 +89,38 @@
                 const mediaItems = [
                     {
                         type: 'image',
-                        src: "https://placehold.co/600x450/C0C0C0/white?text=Image+1",
-                        pos: { x: 0.0, y: 1.2, z: 0.05, rot: 0 } // قاب بالا
+                        src: "https://placehold.co/600x600/C0C0C0/white?text=Image+1", // مربع شده
+                        width: '0.8', // بزرگتر شده
+                        height: '0.8', // بزرگتر شده
+                        pos: { x: 0.0, y: 1.5, z: 0.05, rot: 0 } // بالاتر قرار گرفته
                     },
                     {
                         type: 'image',
-                        src: "https://placehold.co/600x450/A9A9A9/white?text=Image+2",
-                        pos: { x: -0.9, y: 0.7, z: 0.05, rot: 10 } // قاب بالا سمت چپ
+                        src: "https://placehold.co/1200x600/A9A9A9/white?text=Image+2", // دو برابر شده
+                        width: '1.2',
+                        height: '0.6',
+                        pos: { x: -0.7, y: 0.8, z: 0.05, rot: 10 } // بالاتر و نزدیک به مرکز
                     },
                     {
                         type: 'video',
                         src: "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_stereo.mp4",
-                        pos: { x: 0.9, y: 0.7, z: 0.05, rot: -10 } // قاب بالا سمت راست
+                        width: '1.2',
+                        height: '0.6',
+                        pos: { x: 0.7, y: 0.8, z: 0.05, rot: -10 } // بالاتر و نزدیک به مرکز
                     },
                     {
                         type: 'image',
-                        src: "https://placehold.co/600x450/708090/white?text=Image+4",
-                        pos: { x: -1.2, y: -0.1, z: 0.05, rot: 15 } // قاب پایین سمت چپ
+                        src: "https://placehold.co/600x1200/708090/white?text=Image+4", // عمودی شده
+                        width: '0.6',
+                        height: '1.2',
+                        pos: { x: -1.2, y: -0.1, z: 0.05, rot: 15 } // عمودی شده
                     },
                     {
                         type: 'video',
                         src: "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_stereo.mp4",
-                        pos: { x: 1.2, y: -0.1, z: 0.05, rot: -15 } // قاب پایین سمت راست
+                        width: '0.6',
+                        height: '1.2',
+                        pos: { x: 1.2, y: -0.1, z: 0.05, rot: -15 } // عمودی شده
                     }
                 ];
 
@@ -122,8 +132,8 @@
 
                     // Create the frame
                     const frame = document.createElement('a-plane');
-                    frame.setAttribute('width', '0.7');
-                    frame.setAttribute('height', '0.55');
+                    frame.setAttribute('width', item.width * 1.15); // کمی بزرگتر از محتوا
+                    frame.setAttribute('height', item.height * 1.15); // کمی بزرگتر از محتوا
                     frame.setAttribute('position', `0 0 0.01`);
                     frame.setAttribute('material', 'color: #333; transparent: true; opacity: 0.9');
 
@@ -131,13 +141,13 @@
                     let mediaElement;
                     if (item.type === 'image') {
                         mediaElement = document.createElement('a-image');
-                        mediaElement.setAttribute('width', '0.6');
-                        mediaElement.setAttribute('height', '0.45');
+                        mediaElement.setAttribute('width', item.width);
+                        mediaElement.setAttribute('height', item.height);
                         mediaElement.setAttribute('src', item.src);
                     } else if (item.type === 'video') {
                         mediaElement = document.createElement('a-video');
-                        mediaElement.setAttribute('width', '0.6');
-                        mediaElement.setAttribute('height', '0.45');
+                        mediaElement.setAttribute('width', item.width);
+                        mediaElement.setAttribute('height', item.height);
                         mediaElement.setAttribute('src', item.src);
                         mediaElement.setAttribute('loop', 'true');
                         mediaElement.setAttribute('autoplay', 'true');
