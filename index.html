@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-    <title>Our Memory - AR Experience (Final Position)</title>
+    <title>Our Memory - AR Experience (Final Stabilized)</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -32,7 +32,6 @@
             init: function() {
                 const targetEntity = this.el;
 
-                // A constant value has been added to the 'y' position of all items to move them up.
                 const mediaItems = [
                     // Item 1
                     { 
@@ -148,7 +147,7 @@
         Wait for new photos and videos to appear!
     </div>
 
-    <a-scene mindar-image="imageTargetSrc: targets.mind;"
+    <a-scene mindar-image="imageTargetSrc: targets.mind; filterMinCF: 0.01; missTolerance: 10; warmupTolerance: 10;"
              color-space="sRGB"
              renderer="colorManagement: true, physicallyCorrectLights: true"
              vr-mode-ui="enabled: false"
